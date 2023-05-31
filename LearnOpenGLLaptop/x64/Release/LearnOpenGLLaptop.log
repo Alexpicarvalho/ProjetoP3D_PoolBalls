@@ -1,7 +1,0 @@
-﻿LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
-  Generating code
-  Previous IPDB was built with incompatible compiler, fall back to full compilation.
-  All 14 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
-  Finished generating code
-glew32s.lib(glew.obj) : warning LNK4099: PDB '' was not found with 'glew32s.lib(glew.obj)' or at ''; linking object as if no debug info
-  LearnOpenGLLaptop.vcxproj -> D:\IPCA22_23\P3D\TP\ProjetoP3D_PoolBalls\x64\Release\LearnOpenGLLaptop.exe
