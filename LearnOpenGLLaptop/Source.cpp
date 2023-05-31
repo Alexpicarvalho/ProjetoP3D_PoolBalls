@@ -14,7 +14,7 @@ using namespace std;
 #pragma comment(lib, "opengl32.lib") 
 
 void init(void);
-float* createVertexBuffer(void);
+//float* createVertexBuffer(void);
 void displayLegacy(void);
 void display(void);
 
