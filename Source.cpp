@@ -1,17 +1,20 @@
-
-#include <iostream>
-#include <Windows.h>
-#include <string>
-#include <vector>
-#define GLEW_STATIC
-#include <GL\glew.h>
-#include <GLFW\glfw3.h>
-
-using namespace std;
-
 #pragma comment(lib, "glew32s.lib")
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "opengl32.lib")
+
+#include <iostream>
+using namespace std;
+
+#define GLEW_STATIC
+#include <GL\glew.h>
+
+#include <GLFW\glfw3.h>
+
+#include <Windows.h>
+#include <string>
+#include <vector>
+
+#include "Load.h"
 
 void init(void);
 float* createVertexBuffer(void);
@@ -24,18 +27,69 @@ float angle = 0.0f;
 int main() {
 
 	if (!glfwInit()) return -1;
-	/*glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);*/
 
+	GLFWwindow* window = glfwCreateWindow(1600, 900, "Window", NULL, NULL);
 
-	GLFWwindow* window = glfwCreateWindow(800, 600, "Window", NULL, NULL);
 	if (window == NULL) {
 		glfwTerminate();
 		return -1;
 	}
 	else cout << "Window is Working" << endl;
+
 	glfwMakeContextCurrent(window);
+
+	vector<string> objFiles{
+		"poolballs/Ball1.obj",
+		"poolballs/Ball2.obj",
+		"poolballs/Ball3.obj",
+		"poolballs/Ball4.obj",
+		"poolballs/Ball5.obj",
+		"poolballs/Ball6.obj",
+		"poolballs/Ball7.obj",
+		"poolballs/Ball8.obj",
+		"poolballs/Ball9.obj",
+		"poolballs/Ball10.obj",
+		"poolballs/Ball11.obj",
+		"poolballs/Ball12.obj",
+		"poolballs/Ball13.obj",
+		"poolballs/Ball14.obj",
+		"poolballs/Ball15.obj"
+	};
+
+	vector<string> textureFiles
+	{
+		"poolballs/PoolBalluv1.jpg",
+		"poolballs/PoolBalluv2.jpg",
+		"poolballs/PoolBalluv3.jpg",
+		"poolballs/PoolBalluv4.jpg",
+		"poolballs/PoolBalluv5.jpg",
+		"poolballs/PoolBalluv6.jpg",
+		"poolballs/PoolBalluv7.jpg",
+		"poolballs/PoolBalluv8.jpg",
+		"poolballs/PoolBalluv9.jpg",
+		"poolballs/PoolBalluv10.jpg",
+		"poolballs/PoolBalluv11.jpg",
+		"poolballs/PoolBalluv12.jpg",
+		"poolballs/PoolBalluv13.jpg",
+		"poolballs/PoolBalluv14.jpg",
+		"poolballs/PoolBalluv15.jpg"
+	};
+
+	{
+		using namespace Load;
+		vector<Obj> objArray;
+
+		for (string i : objFiles)
+		{
+			Obj obj;
+			objArray.push_back(obj);
+			obj.Read(i);
+
+			cout << i << endl;
+		}
+
+	}
+
 
 	//Glew Init must be called only when context has been defined 
 
