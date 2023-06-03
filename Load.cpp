@@ -1,5 +1,7 @@
 #include "Load.h"
 #include "LoadShaders.h"
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/ext.hpp>
 #include "stb_image.h"
 
 
@@ -220,7 +222,7 @@ void Obj::Send(void)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject[i]);
 
-		// Upload da respetiva data para o buffer que está BIND (0);
+		// Upload da respetiva data para o buffer que estï¿½ BIND (0);
 		if (i == 0) glBufferStorage(GL_ARRAY_BUFFER, sizeof(lPositions), lPositions, 0);
 
 		if (i == 1) glBufferStorage(GL_ARRAY_BUFFER, sizeof(lNormals), lNormals, 0);
@@ -253,13 +255,13 @@ GLuint Obj:: getShaderProgram() {
 	glUseProgram(shaderProgram); // Associa este shader program ao corrent render state
 
 
-	//Localizações (pointers) dos atributos dos vértices no shader
+	//Localizaï¿½ï¿½es (pointers) dos atributos dos vï¿½rtices no shader
 	GLuint sPositions = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "vertexPosition"); //CONFIRMAR NOMES DENTRO DO VERTEX E FRAGMENT
 	GLuint sNormals = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "vertexNormals");	// SHADERS
 	GLuint sTexcoords = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "texCoords");
 
-	//	Configuramos os vertex attributes no shader program utilizando os 3 VBO's criados, o 1º para positions
-	// 2º para as normais e 3º para as coordenadas de textura
+	//	Configuramos os vertex attributes no shader program utilizando os 3 VBO's criados, o 1ï¿½ para positions
+	// 2ï¿½ para as normais e 3ï¿½ para as coordenadas de textura
 	
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject[0]);
 	glVertexAttribPointer(sPositions, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
@@ -286,6 +288,32 @@ GLuint Obj:: getShaderProgram() {
 
 void Obj::Draw(glm::vec3 position, glm::vec3 orientation)
 {
+	using namespace glm;
+	mat4 tempModel = model;
+	tempModel = translate(tempModel, position);
 
+	tempModel = rotate(tempModel, radians(orientation.x), vec3(1, 0, 0));
+	tempModel = rotate(tempModel, radians(orientation.y), vec3(0, 1, 0));
+	tempModel = rotate(tempModel, radians(orientation.z), vec3(0, 0, 1));
+
+	GLint modelId = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "Model");
+	glProgramUniformMatrix4fv(shaderProgram, modelId, 1, GL_FALSE, value_ptr(tempModel));
+
+	mat4 modelView = Camera::GetInstance()->view * tempModel;
+	GLint modelViewId = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "ModelView");
+	glProgramUniformMatrix4fv(shaderProgram, modelViewId, 1, GL_FALSE, value_ptr(modelView));
+
+	mat3 normalMatrix = glm::inverseTranspose(glm::mat3(modelView));
+	GLint normalMatrixId = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "NormalMatrix");
+	glProgramUniformMatrix4fv(shaderProgram, normalMatrixId, 1, GL_FALSE, value_ptr(normalMatrix));
+
+	GLint viewId = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "View");
+	glProgramUniformMatrix4fv(shaderProgram, viewId, 1, GL_FALSE, value_ptr(Camera::GetInstance()->view));
+
+	GLint projectionId = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "Projection");
+	glProgramUniformMatrix4fv(shaderProgram, projectionId, 1, GL_FALSE, value_ptr(Camera::GetInstance()->projection));
+
+	glBindVertexArray(vertexArrayObject);
+
+	glDrawArrays(GL_TRIANGLES, 0, positions.size());
 }
-

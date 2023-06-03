@@ -27,6 +27,7 @@ namespace Load {
 		void ReadTexture(const std::string);
 		void Send(void);
 		void Draw(glm::vec3, glm::vec3);
+		glm::mat4 model;
 		GLuint getShaderProgram();
 	private : 
 
@@ -41,7 +42,7 @@ namespace Load {
 
 		//buffers
 		GLuint vertexArrayObject;
-		GLuint vertexBufferObject[3]; // Cada tipo de data numa posição (0 = posição, 1 = normais, 2 = coordenadas da UV)
+		GLuint vertexBufferObject[3]; // Cada tipo de data numa posiï¿½ï¿½o (0 = posiï¿½ï¿½o, 1 = normais, 2 = coordenadas da UV)
 
 		//Shader
 		GLuint shaderProgram;
