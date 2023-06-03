@@ -37,7 +37,17 @@ int main() {
 	else cout << "Window is Working" << endl;
 
 	glfwMakeContextCurrent(window);
+	init();
+	glewInit();
 
+	//Glew Init must be called only when context has been defined 
+
+	if (glewInit() != GLEW_OK) {
+		cout << "Failed to initialize GLEW" << endl;
+		return -1;
+	}
+	else cout << "Glew Initialized Successfully " << "\n GL Version: " << glGetString(GL_VERSION) << endl;
+	
 	vector<string> objFiles{
 		"poolballs/Ball1.obj",
 		"poolballs/Ball2.obj",
@@ -81,43 +91,16 @@ int main() {
 
 		for (string i : objFiles)
 		{
-			Obj obj;
-			objArray.push_back(obj);
-			obj.Read(i);
-			obj.Send();
+
 
 			cout << i << endl;
 		}
-
+		Obj obj;
+		objArray.push_back(obj);
+		obj.Read("poolballs/Ball1.obj");
+		obj.Send();
 	}
 
-
-	//Glew Init must be called only when context has been defined 
-
-	if (glewInit() != GLEW_OK) {
-		cout << "Failed to initialize GLEW" << endl;
-		return -1;
-	}
-	else cout << "Glew Initialized Successfully " << "\n GL Version: " << glGetString(GL_VERSION) << endl;
-
-	init();
-
-	//Buffer Creation
-	GLuint buffer;
-	GLfloat vertexPosition[6] = {
-		-0.5f, -0.5f,
-		 0.0f,  0.5f,
-		 0.5f, -0.5f
-	};
-
-	glGenBuffers(1, &buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), vertexPosition, GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -137,43 +120,8 @@ int main() {
 }
 
 void init() {
-	glViewport(0, 0, 800, 600);
-	glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-	//glewExperimental = GL_TRUE;
-	//glewInit();
-}
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glEnable(GL_DEPTH_TEST);
 
-float* createVertexBuffer() {
-
-}
-
-void display() {
-
-}
-
-
-void displayLegacy() {
-
-	//Apply Transformation Changes
-	glLoadIdentity();
-	// Translate to the center of the screen
-	glTranslatef(0.0f, 0.0f, 0.0f);
-
-	// Rotate around the Y-axis
-	glRotatef(angle, 0.0f, 1.0f, 0.0f);
-
-	glClear(GL_COLOR_BUFFER_BIT);
-	//cout << "Drawing" << endl;
-
-	glBegin(GL_TRIANGLES);
-	glColor3f(0.0f, 1.0f, 0.0f);
-	glVertex2f(-0.5f, -0.5f);
-	glColor3f(0.0f, 0.0f, 1.0f);
-	glVertex2f(0.0f, 0.5f);
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glVertex2f(0.5f, -0.5f);
-
-	glEnd();
-
-	angle += 1.0f;
+	glEnable(GL_CULL_FACE);
 }
