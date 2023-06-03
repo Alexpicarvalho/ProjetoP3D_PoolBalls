@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm\glm.hpp>
+#include <gl\GL.h>
 
 #include <string>
 #include <sstream>
@@ -20,10 +21,14 @@ namespace Load {
 	{
 	public:
 		void Read(const std::string);
+		void ReadMaterial(const std::string);
+		void ReadTexture(const std::string);
 		void Send(void);
 		void Draw(glm::vec3, glm::vec3);
 	private : 
 		std::vector<VertexData> vertData;
+		glm::vec3 ka, kd, ks;
+		GLfloat ns;
 
 		//buffers
 		GLuint vertexArrayObject;
