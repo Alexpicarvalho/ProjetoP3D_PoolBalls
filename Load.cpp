@@ -238,7 +238,7 @@ void Obj::Send(void)
 	}
 }
 
-GLuint Obj:: getShaderProgram() {
+void Obj:: getShaderProgram() {
 
 	ShaderInfo shaders[] = {
 	{ GL_VERTEX_SHADER,"VballShader.vert" },
@@ -281,7 +281,7 @@ GLuint Obj:: getShaderProgram() {
 	GLint texture = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "texture");
 	glProgramUniform1i(shaderProgram, texture, 0);
 
-	return shaderProgram;
+	//return shaderProgram;
 }
 
 void Obj::Draw(glm::vec3 position, glm::vec3 orientation)

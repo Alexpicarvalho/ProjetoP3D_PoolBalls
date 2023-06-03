@@ -27,7 +27,7 @@ namespace Load {
 		void ReadTexture(const std::string);
 		void Send(void);
 		void Draw(glm::vec3, glm::vec3);
-		GLuint getShaderProgram();
+		void getShaderProgram();
 	private : 
 
 		//Vertex data types
