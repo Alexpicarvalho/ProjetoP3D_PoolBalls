@@ -1,4 +1,5 @@
 #include "Load.h"
+#include "LoadShaders.h"
 
 using namespace Load;
 
@@ -198,9 +199,6 @@ void Obj::Send(void)
 	}
 
 
-
-
-
 	//Debugging
 
 	GLenum error = glGetError();
@@ -209,7 +207,54 @@ void Obj::Send(void)
 	}
 }
 
+GLuint Obj:: getShaderProgram() {
+
+	ShaderInfo shaders[] = {
+	{ GL_VERTEX_SHADER,"VballShader.vert" },
+	{ GL_FRAGMENT_SHADER, "FballShader.frag" },
+	{ GL_NONE, NULL }   //GL_None marca o final da lista de shader info
+	};
+
+	//Shader ID
+	shaderProgram = LoadShaders(shaders);
+	this -> shaderProgram =  shaderProgram;
+
+	glUseProgram(shaderProgram); // Associa este shader program ao corrent render state
+
+
+	//Localizações (pointers) dos atributos dos vértices no shader
+	GLuint sPositions = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "vertexPosition"); //CONFIRMAR NOMES DENTRO DO VERTEX E FRAGMENT
+	GLuint sNormals = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "vertexNormals");	// SHADERS
+	GLuint sTexcoords = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "texCoords");
+
+	//	Configuramos os vertex attributes no shader program utilizando os 3 VBO's criados, o 1º para positions
+	// 2º para as normais e 3º para as coordenadas de textura
+	
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject[0]);
+	glVertexAttribPointer(sPositions, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject[1]);
+	glVertexAttribPointer(sPositions, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject[2]);
+	glVertexAttribPointer(sPositions, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+	//Enable nos atributos
+
+	glEnableVertexAttribArray(sPositions);
+	glEnableVertexAttribArray(sNormals);
+	glEnableVertexAttribArray(sTexcoords);
+
+	//Texture Handeling
+
+	GLint texture = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "texture");
+	glProgramUniform1i(shaderProgram, texture, 0);
+
+	return shaderProgram;
+}
+
 void Obj::Draw(glm::vec3 position, glm::vec3 orientation)
 {
 
 }
+
