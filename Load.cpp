@@ -241,7 +241,7 @@ void Obj::Send(void)
 	}
 }
 
-void Obj:: getShaderProgram() {
+void Obj::CreateShaderProgram() {
 
 	ShaderInfo shaders[] = {
 	{ GL_VERTEX_SHADER,"VballShader.vert" },
