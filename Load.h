@@ -13,11 +13,11 @@
 
 namespace Load {
 
-	struct VertexData {
+	/*struct VertexData {
 		glm::vec3 position;
 		glm::vec3 normal;
 		glm::vec2 texcoords;
-	};
+	};*/
 
 	class Obj
 	{
@@ -28,7 +28,13 @@ namespace Load {
 		void Send(void);
 		void Draw(glm::vec3, glm::vec3);
 	private : 
-		std::vector<VertexData> vertData;
+
+		//Vertex data types
+		std::vector < glm::vec3> positions;
+		std::vector < glm::vec3> normals;
+		std::vector < glm::vec2> texcoords;
+
+		//std::vector<VertexData> vertData;
 		glm::vec3 ka, kd, ks;
 		GLfloat ns;
 

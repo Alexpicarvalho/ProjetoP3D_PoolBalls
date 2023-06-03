@@ -4,9 +4,14 @@ using namespace Load;
 
 void Obj::Read(const std::string obj_model_filepath)
 {
+
+
 	std::cout << "reading" << std::endl;
 	using namespace std;
 	ifstream file(obj_model_filepath);
+
+	int debugCounter = 0;
+
 
 	if (!file.is_open())
 	{
@@ -14,9 +19,9 @@ void Obj::Read(const std::string obj_model_filepath)
 		return;
 	}
 
-	std::vector<glm::vec3> positions;
-	std::vector<glm::vec3> normals;
-	std::vector<glm::vec2> texcoords;
+	std::vector<glm::vec3> tempPositions;
+	std::vector<glm::vec3> tempNormals;
+	std::vector<glm::vec2> tempTexcoords;
 
 	string line;
 
@@ -31,24 +36,26 @@ void Obj::Read(const std::string obj_model_filepath)
 		{
 			glm::vec3 position;
 			iss >> position.x >> position.y >> position.z;
-			positions.push_back(position);
+			tempPositions.push_back(position);
 		}
 		else if (type == "vn")
 		{
 			glm::vec3 normal;
 			iss >> normal.x >> normal.y >> normal.z;
-			normals.push_back(normal);
+			tempNormals.push_back(normal);
 		}
 		else if (type == "vt")
 		{
 			glm::vec2 texcoord;
 			iss >> texcoord.x >> texcoord.y;
-			texcoords.push_back(texcoord);
+			tempTexcoords.push_back(texcoord);
 		}
 		else if (type == "f")
 		{
 			for (int i = 0; i < 3; ++i)
 			{
+				//std :: cout << "F Counter" << debugCounter++ << std::endl;
+
 				string vertexData;
 				iss >> vertexData;
 
@@ -64,12 +71,16 @@ void Obj::Read(const std::string obj_model_filepath)
 				getline(viss, index, '/');
 				int normalIndex = stoi(index) - 1;
 
-				VertexData vertex;
+				positions.push_back(tempPositions[positionIndex]);
+				normals.push_back(tempNormals[normalIndex]);
+				texcoords.push_back(tempTexcoords[texcoordIndex]);
+
+				/*VertexData vertex;
 				vertex.position = positions[positionIndex];
 				vertex.normal = normals[normalIndex];
 				vertex.texcoords = texcoords[texcoordIndex];
 
-				vertData.push_back(vertex);
+				vertData.push_back(vertex);*/
 			}
 		}
 
@@ -81,6 +92,7 @@ void Obj::Read(const std::string obj_model_filepath)
 			Obj::ReadMaterial(matFileName);
 		}
 	}
+	file.close();
 }
 
 void Obj::ReadMaterial(const std::string mtl_fileName)
@@ -105,19 +117,19 @@ void Obj::ReadMaterial(const std::string mtl_fileName)
 
 		if (type == "ka")
 		{
-			
+
 		}
 		else if (type == "kd")
 		{
-			
+
 		}
 		else if (type == "ks")
 		{
-			
+
 		}
 		else if (type == "ns")
 		{
-			
+
 		}
 		else if (type == "map_Kd")
 		{
@@ -136,37 +148,45 @@ void Obj::ReadTexture(const std::string tex_fileName)
 
 void Obj::Send(void)
 {
-	GLfloat vertex[4034 * 3];
-	GLfloat normals[4034 * 3];
-	GLfloat textureCoords[4034 * 2];
+	GLfloat lPositions[8064 * 3];
+	GLfloat lNormals[4034 * 3];
+	GLfloat lTextureCoords[4223 * 2];
 
 	//vamos iterar por cada vertice no array de Data
 
-	int currentPosition = 0;
+	std::cout << "Number of posistions : " << positions.size() << std::endl;
+	std::cout << "Number of normals : " << normals.size() << std::endl;
+	std::cout << "Number of texCoords : " << texcoords.size() << std::endl;
 
-	for (VertexData vert : vertData) {
+	for (int i = 0; i < positions.size() / 3; i++) {
 
 		//Vertices
-		vertex[currentPosition * 3] = vert.position.x;
-		vertex[currentPosition * 3 + 1] = vert.position.y;
-		vertex[currentPosition * 3 + 2] = vert.position.z;
+		lPositions[i * 3] = positions[i].x;
+		lPositions[i * 3 + 1] = positions[i].y;
+		lPositions[i * 3 + 2] = positions[i].z;
 
 		//Normais
-		normals[currentPosition * 3] = vert.normal.x;
-		normals[currentPosition * 3 + 1] = vert.normal.y;
-		normals[currentPosition * 3 + 2] = vert.normal.z;
+		lNormals[i * 3] = normals[i].x;
+		lNormals[i * 3 + 1] = normals[i].y;
+		lNormals[i * 3 + 2] = normals[i].z;
 
 		//Coordenadas de Texture
-		textureCoords[currentPosition * 2] = vert.texcoords.x;
-		textureCoords[currentPosition * 2 + 1] = vert.texcoords.y;
+		lTextureCoords[i * 2] = texcoords[i].x;
+		lTextureCoords[i * 2 + 1] = texcoords[i].y;
 
-		currentPosition++;
+		//std::cout << "Current position: " << currentPosition << std::endl;
 	}
 
 	//GL Methods, 
 
+
+
 	glGenVertexArrays(1, &vertexArrayObject); // Geramos o VAO e retornamos o respetivo ID
+
+
 	glBindVertexArray(vertexArrayObject);     // Damos bind ao VAO a partir do ID gerado
+
+
 	glGenBuffers(3, vertexBufferObject);
 
 	//Passamos os dados para os VBO's
@@ -174,6 +194,21 @@ void Obj::Send(void)
 	for (int i = 0; i < 3; i++)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject[i]);
+
+		// Upload da respetiva data para o buffer que está BIND (0);
+		if (i == 0) glBufferStorage(GL_ARRAY_BUFFER, sizeof(lPositions), lPositions, 0);
+
+		if (i == 1) glBufferStorage(GL_ARRAY_BUFFER, sizeof(lNormals), lNormals, 0);
+
+		if (i == 2) glBufferStorage(GL_ARRAY_BUFFER, sizeof(lTextureCoords), lTextureCoords, 0);
+
+	}
+
+	//Debugging
+
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "OpenGL Error: " << error << std::endl;
 	}
 }
 

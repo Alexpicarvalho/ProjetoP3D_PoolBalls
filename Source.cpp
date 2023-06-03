@@ -84,6 +84,7 @@ int main() {
 			Obj obj;
 			objArray.push_back(obj);
 			obj.Read(i);
+			obj.Send();
 
 			cout << i << endl;
 		}
