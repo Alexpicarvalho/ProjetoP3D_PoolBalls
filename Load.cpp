@@ -1,5 +1,7 @@
 #include "Load.h"
 #include "LoadShaders.h"
+#include "stb_image.h"
+
 
 using namespace Load;
 
@@ -116,21 +118,21 @@ void Obj::ReadMaterial(const std::string mtl_fileName)
 
 		iss >> type;
 
-		if (type == "ka")
+		if (type == "Ka")
 		{
-
+			iss >> ka.x >> ka.y >> ka.z;
 		}
-		else if (type == "kd")
+		else if (type == "Kd")
 		{
-
+			iss >> kd.x >> kd.y >> kd.z;
 		}
-		else if (type == "ks")
+		else if (type == "Ks")
 		{
-
+			iss >> ks.x >> ks.y >> ks.z;
 		}
-		else if (type == "ns")
+		else if (type == "Ns")
 		{
-
+			iss >> ns;
 		}
 		else if (type == "map_Kd")
 		{
@@ -139,11 +141,40 @@ void Obj::ReadMaterial(const std::string mtl_fileName)
 			Obj::ReadTexture(texFileName);
 		}
 	}
+
+	file.close();
 }
 
 void Obj::ReadTexture(const std::string tex_fileName)
 {
+	GLuint textID = 0;
 
+	glGenTextures(1, &textID);
+
+	glActiveTexture(GL_TEXTURE0);
+
+	glBindTexture(GL_TEXTURE_2D, textID);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	int width, height, nChannels;
+
+	stbi_set_flip_vertically_on_load(true);
+
+	unsigned char* imageData = stbi_load(tex_fileName.c_str(), &width, &height, &nChannels, 0);
+
+	if (imageData)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, nChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, imageData);
+
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		stbi_image_free(imageData);
+	}
+	else std::cout << "Error loading the texture" << std::endl;
 }
 
 
