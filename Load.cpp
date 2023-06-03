@@ -179,8 +179,6 @@ void Obj::Send(void)
 
 	//GL Methods, 
 
-
-
 	glGenVertexArrays(1, &vertexArrayObject); // Geramos o VAO e retornamos o respetivo ID
 
 
@@ -188,7 +186,6 @@ void Obj::Send(void)
 
 
 	glGenBuffers(3, vertexBufferObject);
-
 	//Passamos os dados para os VBO's
 
 	for (int i = 0; i < 3; i++)
