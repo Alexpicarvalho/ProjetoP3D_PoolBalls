@@ -63,6 +63,13 @@ void Obj::Read(const std::string obj_model_filepath)
 
 				getline(viss, index, '/');
 				int normalIndex = stoi(index) - 1;
+
+				VertexData vertex;
+				vertex.position = positions[positionIndex];
+				vertex.normal = normals[normalIndex];
+				vertex.texcoords = texcoords[texcoordIndex];
+
+				vertData.push_back(vertex);
 			}
 		}
 
@@ -129,7 +136,45 @@ void Obj::ReadTexture(const std::string tex_fileName)
 
 void Obj::Send(void)
 {
+	GLfloat vertex[4034 * 3];
+	GLfloat normals[4034 * 3];
+	GLfloat textureCoords[4034 * 2];
 
+	//vamos iterar por cada vertice no array de Data
+
+	int currentPosition = 0;
+
+	for (VertexData vert : vertData) {
+
+		//Vertices
+		vertex[currentPosition * 3] = vert.position.x;
+		vertex[currentPosition * 3 + 1] = vert.position.y;
+		vertex[currentPosition * 3 + 2] = vert.position.z;
+
+		//Normais
+		normals[currentPosition * 3] = vert.normal.x;
+		normals[currentPosition * 3 + 1] = vert.normal.y;
+		normals[currentPosition * 3 + 2] = vert.normal.z;
+
+		//Coordenadas de Texture
+		textureCoords[currentPosition * 2] = vert.texcoords.x;
+		textureCoords[currentPosition * 2 + 1] = vert.texcoords.y;
+
+		currentPosition++;
+	}
+
+	//GL Methods, 
+
+	glGenVertexArrays(1, &vertexArrayObject); // Geramos o VAO e retornamos o respetivo ID
+	glBindVertexArray(vertexArrayObject);     // Damos bind ao VAO a partir do ID gerado
+	glGenBuffers(3, vertexBufferObject);
+
+	//Passamos os dados para os VBO's
+
+	for (int i = 0; i < 3; i++)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject[i]);
+	}
 }
 
 void Obj::Draw(glm::vec3 position, glm::vec3 orientation)
