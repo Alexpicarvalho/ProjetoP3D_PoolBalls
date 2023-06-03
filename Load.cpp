@@ -179,14 +179,8 @@ void Obj::Send(void)
 
 	//GL Methods, 
 
-
-
 	glGenVertexArrays(1, &vertexArrayObject); // Geramos o VAO e retornamos o respetivo ID
-
-
 	glBindVertexArray(vertexArrayObject);     // Damos bind ao VAO a partir do ID gerado
-
-
 	glGenBuffers(3, vertexBufferObject);
 
 	//Passamos os dados para os VBO's
@@ -203,6 +197,10 @@ void Obj::Send(void)
 		if (i == 2) glBufferStorage(GL_ARRAY_BUFFER, sizeof(lTextureCoords), lTextureCoords, 0);
 
 	}
+
+
+
+
 
 	//Debugging
 
