@@ -1,4 +1,4 @@
 # Ignore everything
-.vs
-.git
-x64
+.vs/**
+.git/**
+x64/**
