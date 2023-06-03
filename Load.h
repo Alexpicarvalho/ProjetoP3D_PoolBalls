@@ -1,9 +1,9 @@
 #pragma once
-
+#define GLEW_STATIC
+#define _CRT_SECURE_NO_WARNINGS
+#define GLFW_USE_DWM_SWAP_INTERVAL
 #include <glm\glm.hpp>
 #include <GL\glew.h>
-
-
 
 #include <string>
 #include <sstream>

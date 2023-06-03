@@ -2,6 +2,7 @@
 #include "LoadShaders.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/ext.hpp>
+#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 
@@ -299,19 +300,19 @@ void Obj::Draw(glm::vec3 position, glm::vec3 orientation)
 	GLint modelId = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "Model");
 	glProgramUniformMatrix4fv(shaderProgram, modelId, 1, GL_FALSE, value_ptr(tempModel));
 
-	mat4 modelView = Camera::GetInstance()->view * tempModel;
+	//mat4 modelView = Camera::GetInstance()->view * tempModel;
 	GLint modelViewId = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "ModelView");
-	glProgramUniformMatrix4fv(shaderProgram, modelViewId, 1, GL_FALSE, value_ptr(modelView));
+	//glProgramUniformMatrix4fv(shaderProgram, modelViewId, 1, GL_FALSE, value_ptr(modelView));
 
-	mat3 normalMatrix = glm::inverseTranspose(glm::mat3(modelView));
+	//mat3 normalMatrix = glm::inverseTranspose(glm::mat3(modelView));
 	GLint normalMatrixId = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "NormalMatrix");
-	glProgramUniformMatrix4fv(shaderProgram, normalMatrixId, 1, GL_FALSE, value_ptr(normalMatrix));
+	//glProgramUniformMatrix4fv(shaderProgram, normalMatrixId, 1, GL_FALSE, value_ptr(normalMatrix));
 
-	GLint viewId = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "View");
-	glProgramUniformMatrix4fv(shaderProgram, viewId, 1, GL_FALSE, value_ptr(Camera::GetInstance()->view));
+	//GLint viewId = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "View");
+	//glProgramUniformMatrix4fv(shaderProgram, viewId, 1, GL_FALSE, value_ptr(Camera::GetInstance()->view));
 
-	GLint projectionId = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "Projection");
-	glProgramUniformMatrix4fv(shaderProgram, projectionId, 1, GL_FALSE, value_ptr(Camera::GetInstance()->projection));
+	//GLint projectionId = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "Projection");
+	//glProgramUniformMatrix4fv(shaderProgram, projectionId, 1, GL_FALSE, value_ptr(Camera::GetInstance()->projection));
 
 	glBindVertexArray(vertexArrayObject);
 
