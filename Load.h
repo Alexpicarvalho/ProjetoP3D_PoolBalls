@@ -1,9 +1,9 @@
 #pragma once
-
+#define GLEW_STATIC
+#define _CRT_SECURE_NO_WARNINGS
+#define GLFW_USE_DWM_SWAP_INTERVAL
 #include <glm\glm.hpp>
 #include <GL\glew.h>
-
-
 
 #include <string>
 #include <sstream>
@@ -27,7 +27,9 @@ namespace Load {
 		void ReadTexture(const std::string);
 		void Send(void);
 		void Draw(glm::vec3, glm::vec3);
-		void getShaderProgram();
+		void CreateShaderProgram();
+
+		glm::mat4 model;
 	private : 
 
 		//Vertex data types
@@ -41,7 +43,7 @@ namespace Load {
 
 		//buffers
 		GLuint vertexArrayObject;
-		GLuint vertexBufferObject[3]; // Cada tipo de data numa posição (0 = posição, 1 = normais, 2 = coordenadas da UV)
+		GLuint vertexBufferObject[3]; // Cada tipo de data numa posiï¿½ï¿½o (0 = posiï¿½ï¿½o, 1 = normais, 2 = coordenadas da UV)
 
 		//Shader
 		GLuint shaderProgram;
