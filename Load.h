@@ -10,12 +10,24 @@
 
 namespace Load {
 
+	struct VertexData {
+		glm::vec3 position;
+		glm::vec3 normal;
+		glm::vec2 texcoords;
+	};
+
 	class Obj
 	{
 	public:
 		void Read(const std::string);
 		void Send(void);
 		void Draw(glm::vec3, glm::vec3);
+	private : 
+		std::vector<VertexData> vertData;
+
+		//buffers
+		GLuint vertexArrayObject;
+		GLuint vertexBufferObject[3]; // Cada tipo de data numa posição (0 = posição, 1 = normais, 2 = coordenadas da UV)
 	};
 
 	void Obj::Read(const std::string obj_model_filepath)
@@ -79,6 +91,14 @@ namespace Load {
 					
 					getline(viss, index, '/');
 					int normalIndex = stoi(index) - 1;
+
+					VertexData vertex;
+					vertex.position = positions[positionIndex];
+					vertex.normal = normals[normalIndex];
+					vertex.texcoords = texcoords[texcoordIndex];
+
+					vertData.push_back(vertex);
+
 				}
 			}
 		}
@@ -86,6 +106,39 @@ namespace Load {
 
 	void Obj::Send(void)
 	{
+		GLfloat vertex[4034 * 3];
+		GLfloat normals[4034 * 3];
+		GLfloat textureCoords[4034 * 2];
+
+		//vamos iterar por cada vertice no array de Data
+
+		int currentPosition = 0;
+
+		for (VertexData vert : vertData) {
+
+			//Vertices
+			vertex[currentPosition * 3] = vert.position.x;
+			vertex[currentPosition * 3 + 1] = vert.position.y;
+			vertex[currentPosition * 3 + 2] = vert.position.z;
+
+			//Normais
+			normals[currentPosition * 3] = vert.normal.x;
+			normals[currentPosition * 3 + 1] = vert.normal.y;
+			normals[currentPosition * 3 + 2] = vert.normal.z;
+
+			//Coordenadas de Texture
+			textureCoords[currentPosition * 2] = vert.texcoords.x;
+			textureCoords[currentPosition * 2 + 1] = vert.texcoords.y;
+
+			currentPosition++;
+		}
+
+		//GL Methods, 
+		glGenVertexArrays(1, &vertexArrayObject); // Geramos o VAO e retornamos o respetivo ID
+		glBindVertexArray(vertexArrayObject);     // Damos bind ao VAO a partir do ID gerado
+		glGenBuffers(3, vertexBufferObject);
+
+		//
 
 	}
 
