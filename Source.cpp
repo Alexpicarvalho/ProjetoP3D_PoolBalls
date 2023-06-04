@@ -15,18 +15,23 @@ using namespace std;
 #include <vector>
 
 #include "Load.h"
-
+#include "Camera.h"
 void init(void);
 float* createVertexBuffer(void);
 void displayLegacy(void);
 void display(void);
 
+#define HEIGHT 1600
+#define WIDTH 900
 //Properties
 float angle = 0.0f;
 
 int main() {
 
 	if (!glfwInit()) return -1;
+
+	cam::Camera* camera;
+	camera = camera->GetInstance();
 
 	GLFWwindow* window = glfwCreateWindow(1600, 900, "Window", NULL, NULL);
 
