@@ -16,10 +16,12 @@ using namespace std;
 
 #include "Load.h"
 #include "Camera.h"
+#include "Light.h"
+
 void init(void);
 void DrawTable(std::vector<glm::vec3> tableModel, glm::mat4 mvp);
 std::vector<glm::vec3> CreateTableModel();
-
+vector<Load::Obj> objArray;
 //Propriedades da Mesa
 float tableThickness = 0.25f;    // Valores posteriormente divididos por 2,
 float tableWidth = 2.5f;        // sendo que os vértice mais longe um do outro são esse valor 
@@ -54,6 +56,7 @@ int main() {
 	glfwMakeContextCurrent(window);
 	init();
 	glewInit();
+	glfwSetKeyCallback(window, lighting::OnKeyPressed);
 
 	//Glew Init must be called only when context has been defined 
 
@@ -102,19 +105,17 @@ int main() {
 
 	{
 		using namespace Load;
-		vector<Obj> objArray;
+		
 
 		for (string i : objFiles)
 		{
-
-
 			cout << i << endl;
 		}
-		Obj obj;
+	}
+		Load::Obj obj;
 		objArray.push_back(obj);
 		obj.Read("poolballs/Ball1.obj");
-		obj.Send();
-	}
+		//obj.Send();
 
 
 	while (!glfwWindowShouldClose(window))
@@ -127,7 +128,11 @@ int main() {
 
 		//glDrawArrays(GL_TRIANGLES, 0, 3); // NO INDEX BUFFER
 		DrawTable(tableModel, mvp);
-
+		//for (auto obj : objArray)
+		//{
+			lighting::Lights(&obj);
+			obj.Draw(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+		//}
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -146,7 +151,7 @@ void init() {
 }
 
 void DrawTable(std::vector<glm::vec3> tableModel, glm :: mat4 mvp) {           // Testar se conseguimos ter o método de display legacy a funcionar simultâneamente com o modern OpenGL
-
+	cout << "oi";
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	float* vertex_stream = static_cast<float*>(glm::value_ptr(tableModel.front()));
@@ -172,7 +177,7 @@ void DrawTable(std::vector<glm::vec3> tableModel, glm :: mat4 mvp) {           /
 }
 
 std::vector<glm::vec3> CreateTableModel() {
-
+	
 	float lWidth = tableWidth / 2;
 	float lThickness = tableThickness / 2 + heightOffset;
 	float lLength = tableLength / 2;

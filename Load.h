@@ -25,11 +25,15 @@ namespace Load {
 		void Read(const std::string);
 		void ReadMaterial(const std::string);
 		void ReadTexture(const std::string);
-		void Send(void);
+		GLuint Send(void);
 		void Draw(glm::vec3, glm::vec3);
-		void CreateShaderProgram();
+		GLuint CreateShaderProgram();
 
 		glm::mat4 model;
+		GLuint shaderProgram;
+
+		glm::vec3 ka, kd, ks;
+		GLfloat ns;
 	private : 
 
 		//Vertex data types
@@ -38,14 +42,11 @@ namespace Load {
 		std::vector < glm::vec2> texcoords;
 
 		//std::vector<VertexData> vertData;
-		glm::vec3 ka, kd, ks;
-		GLfloat ns;
 
 		//buffers
 		GLuint vertexArrayObject;
 		GLuint vertexBufferObject[3]; // Cada tipo de data numa posi��o (0 = posi��o, 1 = normais, 2 = coordenadas da UV)
 
 		//Shader
-		GLuint shaderProgram;
 	};
 }

@@ -182,7 +182,7 @@ void Obj::ReadTexture(const std::string tex_fileName)
 }
 
 
-void Obj::Send(void)
+GLuint Obj::Send(void)
 {
 	GLfloat lPositions[8064 * 3];
 	GLfloat lNormals[4034 * 3];
@@ -232,17 +232,17 @@ void Obj::Send(void)
 		if (i == 2) glBufferStorage(GL_ARRAY_BUFFER, sizeof(lTextureCoords), lTextureCoords, 0);
 
 	}
-
-
 	//Debugging
 
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR) {
 		std::cout << "OpenGL Error: " << error << std::endl;
 	}
+
+	return Obj::CreateShaderProgram();
 }
 
-void Obj::CreateShaderProgram() {
+GLuint Obj::CreateShaderProgram() {
 
 	ShaderInfo shaders[] = {
 	{ GL_VERTEX_SHADER,"VballShader.vert" },
@@ -251,7 +251,7 @@ void Obj::CreateShaderProgram() {
 	};
 
 	//Shader ID
-	shaderProgram = LoadShaders(shaders);
+	GLuint shaderProgram = LoadShaders(shaders);
 	this -> shaderProgram =  shaderProgram;
 
 	glUseProgram(shaderProgram); // Associa este shader program ao corrent render state
@@ -284,8 +284,7 @@ void Obj::CreateShaderProgram() {
 
 	GLint texture = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "texture");
 	glProgramUniform1i(shaderProgram, texture, 0);
-
-	//return shaderProgram;
+	return shaderProgram;
 }
 
 void Obj::Draw(glm::vec3 position, glm::vec3 orientation)
