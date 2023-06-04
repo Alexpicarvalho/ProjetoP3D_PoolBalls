@@ -11,8 +11,6 @@ using namespace Load;
 
 void Obj::Read(const std::string obj_model_filepath)
 {
-
-
 	std::cout << "reading" << std::endl;
 	using namespace std;
 	ifstream file(obj_model_filepath);
@@ -90,13 +88,11 @@ void Obj::Read(const std::string obj_model_filepath)
 				vertData.push_back(vertex);*/
 			}
 		}
-
-		else if (type == "mtlib")
+		if (type == "mtllib")
 		{
-			std::string matFileName;
-			iss >> matFileName;
-
-			Obj::ReadMaterial(matFileName);
+			string mtlFileName;
+			iss >> mtlFileName; // Salvar o nome do arquivo MTL
+			ReadMaterial(mtlFileName);
 		}
 	}
 	file.close();
@@ -105,7 +101,7 @@ void Obj::Read(const std::string obj_model_filepath)
 void Obj::ReadMaterial(const std::string mtl_fileName)
 {
 	using namespace std;
-	ifstream file(mtl_fileName);
+	ifstream file("poolballs/" + mtl_fileName);
 
 	if (!file.is_open())
 	{
@@ -168,7 +164,9 @@ void Obj::ReadTexture(const std::string tex_fileName)
 
 	stbi_set_flip_vertically_on_load(true);
 
-	unsigned char* imageData = stbi_load(tex_fileName.c_str(), &width, &height, &nChannels, 0);
+	std::string tmpTexFile = "poolballs/" + tex_fileName;
+
+	unsigned char* imageData = stbi_load(tmpTexFile.c_str(), &width, &height, &nChannels, 0);
 
 	if (imageData)
 	{
@@ -190,9 +188,9 @@ GLuint Obj::Send(void)
 
 	//vamos iterar por cada vertice no array de Data
 
-	std::cout << "Number of posistions : " << positions.size() << std::endl;
-	std::cout << "Number of normals : " << normals.size() << std::endl;
-	std::cout << "Number of texCoords : " << texcoords.size() << std::endl;
+	//std::cout << "Number of posistions : " << positions.size() << std::endl;
+	//std::cout << "Number of normals : " << normals.size() << std::endl;
+	//std::cout << "Number of texCoords : " << texcoords.size() << std::endl;
 
 	for (int i = 0; i < positions.size() / 3; i++) {
 
@@ -204,7 +202,7 @@ GLuint Obj::Send(void)
 		//Normais
 		lNormals[i * 3] = normals[i].x;
 		lNormals[i * 3 + 1] = normals[i].y;
-		lNormals[i * 3 + 2] = normals[i].z;
+		lNormals[i * 3 + 2] = normals[i ].z;
 
 		//Coordenadas de Texture
 		lTextureCoords[i * 2] = texcoords[i].x;
@@ -262,6 +260,10 @@ GLuint Obj::CreateShaderProgram() {
 	GLuint sNormals = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "vertexNormals");	// SHADERS
 	GLuint sTexcoords = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "texCoords");
 
+	{
+		using namespace std;
+		cout << sPositions << endl << sNormals << endl << sTexcoords;
+	}
 	//	Configuramos os vertex attributes no shader program utilizando os 3 VBO's criados, o 1� para positions
 	// 2� para as normais e 3� para as coordenadas de textura
 	

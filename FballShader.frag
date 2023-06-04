@@ -3,6 +3,7 @@
 uniform mat4 Model;
 uniform mat4 View;
 uniform mat4 ModelView;		// View * Model
+uniform sampler2D texture;
 
 uniform samplerCube cubeMap;
 
