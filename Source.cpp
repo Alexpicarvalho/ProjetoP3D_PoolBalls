@@ -15,7 +15,7 @@ using namespace std;
 #include <vector>
 
 #include "Load.h"
-
+#include "Camera.h"
 void init(void);
 void DrawTable();
 std::vector<glm::vec3> CreateTableModel();
@@ -27,12 +27,17 @@ float tableLength = 1.5f;       // positivo e negativo
 float heightOffset = 0.0f;
 
 
+#define HEIGHT 1600
+#define WIDTH 900
 //Properties
 float angle = 0.0f;
 
 int main() {
 
 	if (!glfwInit()) return -1;
+
+	cam::Camera* camera;
+	camera = camera->GetInstance();
 
 	GLFWwindow* window = glfwCreateWindow(1600, 900, "Window", NULL, NULL);
 
