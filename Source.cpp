@@ -17,13 +17,13 @@ using namespace std;
 #include "Load.h"
 #include "Camera.h"
 void init(void);
-void DrawTable();
+void DrawTable(std::vector<glm::vec3> tableModel, glm::mat4 mvp);
 std::vector<glm::vec3> CreateTableModel();
 
 //Propriedades da Mesa
-float tableThickness = 0.5f;    // Valores posteriormente divididos por 2,
-float tableWidth = 1.0f;        // sendo que os vértice mais longe um do outro são esse valor 
-float tableLength = 1.5f;       // positivo e negativo
+float tableThickness = 0.25f;    // Valores posteriormente divididos por 2,
+float tableWidth = 2.5f;        // sendo que os vértice mais longe um do outro são esse valor 
+float tableLength = 4.0f;       // positivo e negativo
 float heightOffset = 0.0f;
 
 
@@ -38,6 +38,10 @@ int main() {
 
 	cam::Camera* camera;
 	camera = camera->GetInstance();
+
+	//Criar o modelo
+	std::vector<glm::vec3> tableModel = CreateTableModel();
+
 
 	GLFWwindow* window = glfwCreateWindow(1600, 900, "Window", NULL, NULL);
 
@@ -115,9 +119,14 @@ int main() {
 
 	while (!glfwWindowShouldClose(window))
 	{
-		
+		//Model matrix = identidade
+		glm::mat4 model = glm::mat4(1.0f);
+
+		//Criar a matriz MVP
+		glm::mat4 mvp = camera->projection * camera->view * model;
+
 		//glDrawArrays(GL_TRIANGLES, 0, 3); // NO INDEX BUFFER
-		DrawTable();
+		DrawTable(tableModel, mvp);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -136,12 +145,11 @@ void init() {
 	glEnable(GL_CULL_FACE);
 }
 
-void DrawTable() {           // Testar se conseguimos ter o método de display legacy a funcionar simultâneamente com o modern OpenGL
+void DrawTable(std::vector<glm::vec3> tableModel, glm :: mat4 mvp) {           // Testar se conseguimos ter o método de display legacy a funcionar simultâneamente com o modern OpenGL
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//Criar o modelo
-	std::vector<glm::vec3> tableModel = CreateTableModel();
+	float* vertex_stream = static_cast<float*>(glm::value_ptr(tableModel.front()));
 	
 	//Desenhar a mesa 
 
@@ -150,17 +158,15 @@ void DrawTable() {           // Testar se conseguimos ter o método de display le
 	//Selecionar a cor
 	glColor3f(0.0f, 0.7f, 0.3f);
 
-	for (int i = 0; i < tableModel.size(); i++)
-	{
-		glm::vec3 v1 = tableModel[i];
-		glm::vec3 v2 = tableModel[i + 1];
-		glm::vec3 v3 = tableModel[i + 2];
-		glm::vec3 v4 = tableModel[i + 3];
+	for (int nv = 0; nv < 6 * 4 * 3; nv += 3) {
 
-		glVertex3f(v1.x, v1.y, v1.z);
-		glVertex3f(v2.x, v2.y, v2.z);
-		glVertex3f(v3.x, v3.y, v3.z);
-		glVertex3f(v4.x, v4.y, v4.z);
+		glm::vec4 vertex = glm::vec4(vertex_stream[nv], vertex_stream[nv + 1], vertex_stream[nv + 2], 1.0f);
+		// Cálculo das coordenadas de recorte
+		glm::vec4 transformed_vertex = mvp * vertex;
+		// Divisão de Perspetiva
+		glm::vec4 normalized_vertex = transformed_vertex / transformed_vertex.w;
+		// Desenho do vértice
+		glVertex3f(normalized_vertex.x, normalized_vertex.y, normalized_vertex.z);
 	}
 	glEnd();
 }
