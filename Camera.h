@@ -13,7 +13,7 @@ namespace cam
 		glm::vec3 position;
 		glm::vec3 target;
 		static Camera* GetInstance();
-		Camera(float fov = 45.0f, float windowWidth = 1600.0f, float windowHeight = 900.0f, glm::vec3 pos = glm::vec3(.5f, .5f, 3.0f), glm::vec3 target = glm::vec3(.5f, .5f, .0f));
+		Camera(float fov = 45.0f, float windowWidth = 1600.0f, float windowHeight = 900.0f, glm::vec3 pos = glm::vec3(.5f, .5f, 5.0f), glm::vec3 target = glm::vec3(.0f, .0f, .0f));
 	private:
 		static Camera* instance;
 	};

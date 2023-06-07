@@ -287,10 +287,10 @@ GLuint Obj::CreateShaderProgram() {
 	glVertexAttribPointer(sPositions, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject[1]);
-	glVertexAttribPointer(sPositions, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+	glVertexAttribPointer(sNormals, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject[2]);
-	glVertexAttribPointer(sPositions, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+	glVertexAttribPointer(sTexcoords, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
 	//Enable nos atributos
 

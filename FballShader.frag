@@ -70,7 +70,7 @@ uniform Material material;
 
 in vec3 vPositionEyeSpace;
 in vec3 vNormalEyeSpace;
-in vec3 textureVector;
+in vec3 uv;
 
 layout (location = 0) out vec4 fColor; // Cor final do fragmento
 
@@ -101,7 +101,7 @@ void main()
 	//fColor = (emissive + light[0] + light[1] + light[2] + light[3] + light[4]) * texture(cubeMap, textureVector);
 	// Com cor de fragmento
 	//fColor = (emissive + light[0] + light[1] + light[2] + light[3] + light[4]) * vec4(1.0, 0.5, 0.5, 1.0);
-	fColor = vec4(1.0, 0.5, 0.5, 1.0);
+	fColor = (emissive + light[0] + light[1] + light[2] + light[3] + light[4]) * texture(texture, uv);
 }
 
 vec4 calcAmbientLight(AmbientLight light) {
