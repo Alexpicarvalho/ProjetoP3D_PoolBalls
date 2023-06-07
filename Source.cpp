@@ -18,6 +18,7 @@ using namespace std;
 #include "Camera.h"
 #include "Light.h"
 
+
 void init(void);
 void DrawTable(std::vector<glm::vec3> tableModel, glm::mat4 mvp);
 std::vector<glm::vec3> CreateTableModel();

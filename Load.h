@@ -10,6 +10,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include "Ball.h"
 
 namespace Load {
 
@@ -31,6 +32,11 @@ namespace Load {
 
 		glm::mat4 model;
 		GLuint shaderProgram;
+
+		//Ball Object
+		//ball::Ball thisBall; 
+
+		//lights
 
 		glm::vec3 ka, kd, ks;
 		GLfloat ns;

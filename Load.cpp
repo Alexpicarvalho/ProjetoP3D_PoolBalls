@@ -206,7 +206,7 @@ GLuint Obj::Send(void)
 		lNormals[i * 3 + 1] = normals[i].y;
 		lNormals[i * 3 + 2] = normals[i].z;
 
-		//Coordenadas de Texture
+		//Coordenadas de Texture\
 		lTextureCoords[i * 2] = texcoords[i].x;
 		lTextureCoords[i * 2 + 1] = texcoords[i].y;
 
