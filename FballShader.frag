@@ -70,7 +70,7 @@ uniform Material material;
 
 in vec3 vPositionEyeSpace;
 in vec3 vNormalEyeSpace;
-in vec3 uv;
+in vec2 uv;
 
 layout (location = 0) out vec4 fColor; // Cor final do fragmento
 
