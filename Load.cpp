@@ -20,7 +20,7 @@ void Obj::Read(const std::string obj_model_filepath)
 
 	if (!file.is_open())
 	{
-		cout << "Error opening the file: " << obj_model_filepath << endl;
+		std::cout << "Error opening the file: " << obj_model_filepath << endl;
 		return;
 	}
 
@@ -60,6 +60,7 @@ void Obj::Read(const std::string obj_model_filepath)
 			vector<int> posIndexes;
 			vector<int> texIndexes;
 			vector<int> normalIndexes;
+			//std::cout << "f ";
 			//std :: cout << "F Counter" << debugCounter++ << std::endl;
 			for (int i = 0; i < 3; ++i)
 			{
@@ -89,7 +90,10 @@ void Obj::Read(const std::string obj_model_filepath)
 				vertex.texcoords = texcoords[texcoordIndex];
 
 				vertData.push_back(vertex);*/
+
+				//std::cout << positionIndex + 1 << "/" << texcoordIndex + 1 << "/" << normalIndex + 1 << " ";
 			}
+			//std::cout << endl;
 		}
 		if (type == "mtllib")
 		{
@@ -98,13 +102,13 @@ void Obj::Read(const std::string obj_model_filepath)
 			ReadMaterial(mtlFileName);
 		}
 	}
-	cout << tempPositions.size() << endl;
-	cout << tempNormals.size() << endl;
-	cout << tempTexcoords.size() << endl;
+	std::cout << tempPositions.size() << endl;
+	std::cout << tempNormals.size() << endl;
+	std::cout << tempTexcoords.size() << endl;
 
-	cout << positions.size() << endl;
-	cout << normals.size() << endl;
-	cout << texcoords.size() << endl;
+	std::cout << positions.size() << endl;
+	std::cout << normals.size() << endl;
+	std::cout << texcoords.size() << endl;
 	//cout << faces.size() << endl;
 
 	file.close();
@@ -117,7 +121,7 @@ void Obj::ReadMaterial(const std::string mtl_fileName)
 
 	if (!file.is_open())
 	{
-		cout << "Error opening the file: " << mtl_fileName << endl;
+		std::cout << "Error opening the file: " << mtl_fileName << endl;
 		return;
 	}
 
@@ -194,9 +198,9 @@ void Obj::ReadTexture(const std::string tex_fileName)
 
 GLuint Obj::Send(void)
 {
-	GLfloat lPositions[8064 * 3];
-	GLfloat lNormals[4034 * 3];
-	GLfloat lTextureCoords[4223 * 2];
+	GLfloat lPositions[8064 * 3 * 3];
+	GLfloat lNormals[8064  * 3 * 3];
+	GLfloat lTextureCoords[8064 * 2 * 3];
 
 	//vamos iterar por cada vertice no array de Data
 
@@ -204,7 +208,7 @@ GLuint Obj::Send(void)
 	//std::cout << "Number of normals : " << normals.size() << std::endl;
 	//std::cout << "Number of texCoords : " << texcoords.size() << std::endl;
 
-	for (int i = 0; i < positions.size() / 3; i++) {
+	for (int i = 0; i < positions.size(); i++) {
 
 		//Vertices
 		lPositions[i * 3] = positions[i].x;
@@ -214,7 +218,7 @@ GLuint Obj::Send(void)
 		//Normais
 		lNormals[i * 3] = normals[i].x;
 		lNormals[i * 3 + 1] = normals[i].y;
-		lNormals[i * 3 + 2] = normals[i ].z;
+		lNormals[i * 3 + 2] = normals[i].z;
 
 		//Coordenadas de Texture
 		lTextureCoords[i * 2] = texcoords[i].x;
@@ -323,7 +327,7 @@ void Obj::Draw(glm::vec3 position, glm::vec3 orientation)
 
 	mat3 normalMatrix = glm::inverseTranspose(glm::mat3(modelView));
 	GLint normalMatrixId = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "NormalMatrix");
-	glProgramUniformMatrix3fv(shaderProgram, normalMatrixId, 1, GL_FALSE, value_ptr(normalMatrix));
+	glProgramUniformMatrix4fv(shaderProgram, normalMatrixId, 1, GL_FALSE, value_ptr(normalMatrix));
 
 	GLint viewId = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "View");
 	glProgramUniformMatrix4fv(shaderProgram, viewId, 1, GL_FALSE, value_ptr(cam::Camera::GetInstance()->view));

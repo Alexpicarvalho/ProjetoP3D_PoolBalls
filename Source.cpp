@@ -133,7 +133,7 @@ int main() {
 		//DrawTable(tableModel, mvp);
 		//for (auto obj : objArray)
 		//{
-		cout << "." << endl;
+		//cout << "." << endl;
 		obj.Draw(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 		//}
 		glfwSwapBuffers(window);
