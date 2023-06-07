@@ -106,21 +106,23 @@ int main() {
 
 	{
 		using namespace Load;
-		
+
 
 		for (string i : objFiles)
 		{
-			cout << i << endl;
+			//cout << i << endl;
 		}
 	}
-		Load::Obj obj;
-		objArray.push_back(obj);
-		obj.Read("poolballs/Ball1.obj");
-		//obj.Send();
+	Load::Obj obj;
+	objArray.push_back(obj);
+	obj.Read("poolballs/Ball1.obj");
+	//obj.Send();
 
+	lighting::Lights(&obj);
 
 	while (!glfwWindowShouldClose(window))
 	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//Model matrix = identidade
 		glm::mat4 model = glm::mat4(1.0f);
 
@@ -128,11 +130,11 @@ int main() {
 		glm::mat4 mvp = camera->projection * camera->view * model;
 
 		//glDrawArrays(GL_TRIANGLES, 0, 3); // NO INDEX BUFFER
-		DrawTable(tableModel, mvp);
+		//DrawTable(tableModel, mvp);
 		//for (auto obj : objArray)
 		//{
-			lighting::Lights(&obj);
-			obj.Draw(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+		cout << "." << endl;
+		obj.Draw(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 		//}
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -151,12 +153,12 @@ void init() {
 	glEnable(GL_CULL_FACE);
 }
 
-void DrawTable(std::vector<glm::vec3> tableModel, glm :: mat4 mvp) {           // Testar se conseguimos ter o método de display legacy a funcionar simultâneamente com o modern OpenGL
-	cout << "oi";
+void DrawTable(std::vector<glm::vec3> tableModel, glm::mat4 mvp) {           // Testar se conseguimos ter o método de display legacy a funcionar simultâneamente com o modern OpenGL
+	//cout << "oi";
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	float* vertex_stream = static_cast<float*>(glm::value_ptr(tableModel.front()));
-	
+
 	//Desenhar a mesa 
 
 	glBegin(GL_QUADS);
@@ -178,7 +180,7 @@ void DrawTable(std::vector<glm::vec3> tableModel, glm :: mat4 mvp) {           /
 }
 
 std::vector<glm::vec3> CreateTableModel() {
-	
+
 	float lWidth = tableWidth / 2;
 	float lThickness = tableThickness / 2 + heightOffset;
 	float lLength = tableLength / 2;

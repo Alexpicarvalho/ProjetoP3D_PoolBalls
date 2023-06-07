@@ -57,9 +57,12 @@ void Obj::Read(const std::string obj_model_filepath)
 		}
 		else if (type == "f")
 		{
+			vector<int> posIndexes;
+			vector<int> texIndexes;
+			vector<int> normalIndexes;
+			//std :: cout << "F Counter" << debugCounter++ << std::endl;
 			for (int i = 0; i < 3; ++i)
 			{
-				//std :: cout << "F Counter" << debugCounter++ << std::endl;
 
 				string vertexData;
 				iss >> vertexData;
@@ -95,6 +98,15 @@ void Obj::Read(const std::string obj_model_filepath)
 			ReadMaterial(mtlFileName);
 		}
 	}
+	cout << tempPositions.size() << endl;
+	cout << tempNormals.size() << endl;
+	cout << tempTexcoords.size() << endl;
+
+	cout << positions.size() << endl;
+	cout << normals.size() << endl;
+	cout << texcoords.size() << endl;
+	//cout << faces.size() << endl;
+
 	file.close();
 }
 
@@ -204,7 +216,7 @@ GLuint Obj::Send(void)
 		lNormals[i * 3 + 1] = normals[i].y;
 		lNormals[i * 3 + 2] = normals[i ].z;
 
-		//Coordenadas de Texture\
+		//Coordenadas de Texture
 		lTextureCoords[i * 2] = texcoords[i].x;
 		lTextureCoords[i * 2 + 1] = texcoords[i].y;
 
@@ -250,7 +262,7 @@ GLuint Obj::CreateShaderProgram() {
 
 	//Shader ID
 	GLuint shaderProgram = LoadShaders(shaders);
-	this -> shaderProgram =  shaderProgram;
+	this->shaderProgram = shaderProgram;
 
 	glUseProgram(shaderProgram); // Associa este shader program ao corrent render state
 
@@ -262,11 +274,11 @@ GLuint Obj::CreateShaderProgram() {
 
 	{
 		using namespace std;
-		cout << sPositions << endl << sNormals << endl << sTexcoords;
+		//cout << sPositions << endl << sNormals << endl << sTexcoords;
 	}
 	//	Configuramos os vertex attributes no shader program utilizando os 3 VBO's criados, o 1� para positions
 	// 2� para as normais e 3� para as coordenadas de textura
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject[0]);
 	glVertexAttribPointer(sPositions, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
@@ -289,10 +301,13 @@ GLuint Obj::CreateShaderProgram() {
 	return shaderProgram;
 }
 
+
 void Obj::Draw(glm::vec3 position, glm::vec3 orientation)
 {
 	using namespace glm;
+	model = glm::mat4(1.0f);
 	mat4 tempModel = model;
+
 	tempModel = translate(tempModel, position);
 
 	tempModel = rotate(tempModel, radians(orientation.x), vec3(1, 0, 0));
@@ -308,7 +323,7 @@ void Obj::Draw(glm::vec3 position, glm::vec3 orientation)
 
 	mat3 normalMatrix = glm::inverseTranspose(glm::mat3(modelView));
 	GLint normalMatrixId = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "NormalMatrix");
-	glProgramUniformMatrix4fv(shaderProgram, normalMatrixId, 1, GL_FALSE, value_ptr(normalMatrix));
+	glProgramUniformMatrix3fv(shaderProgram, normalMatrixId, 1, GL_FALSE, value_ptr(normalMatrix));
 
 	GLint viewId = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "View");
 	glProgramUniformMatrix4fv(shaderProgram, viewId, 1, GL_FALSE, value_ptr(cam::Camera::GetInstance()->view));

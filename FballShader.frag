@@ -100,7 +100,8 @@ void main()
 	// Com CubeMap
 	//fColor = (emissive + light[0] + light[1] + light[2] + light[3] + light[4]) * texture(cubeMap, textureVector);
 	// Com cor de fragmento
-	fColor = (emissive + light[0] + light[1] + light[2] + light[3] + light[4]) * vec4(1.0, 0.5, 0.5, 1.0);
+	//fColor = (emissive + light[0] + light[1] + light[2] + light[3] + light[4]) * vec4(1.0, 0.5, 0.5, 1.0);
+	fColor = vec4(1.0, 0.5, 0.5, 1.0);
 }
 
 vec4 calcAmbientLight(AmbientLight light) {

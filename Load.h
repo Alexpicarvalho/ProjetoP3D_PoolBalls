@@ -14,11 +14,11 @@
 
 namespace Load {
 
-	/*struct VertexData {
-		glm::vec3 position;
-		glm::vec3 normal;
-		glm::vec2 texcoords;
-	};*/
+	struct Face {
+		glm::vec3 positionIndexes;
+		glm::vec3 normalIndexes;
+		glm::vec3 texCoordsIndexes;
+	};
 
 	class Obj
 	{
@@ -46,6 +46,7 @@ namespace Load {
 		std::vector < glm::vec3> positions;
 		std::vector < glm::vec3> normals;
 		std::vector < glm::vec2> texcoords;
+		std::vector < Face> faces; 
 
 		//std::vector<VertexData> vertData;
 
