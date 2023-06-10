@@ -3,7 +3,7 @@
 uniform mat4 Model;
 uniform mat4 View;
 uniform mat4 ModelView;		// View * Model
-uniform sampler2D texture;
+uniform sampler2D texSampler;
 
 uniform samplerCube cubeMap;
 
@@ -38,7 +38,7 @@ struct PointLight	{
 	float quadratic;	// Coeficiente de atenua��o quadr�tica
 };
 
-uniform PointLight pointLight[2]; // Duas fontes de luz pontual
+uniform PointLight pointLight; // Duas fontes de luz pontual
 
 // Estrutura de uma fonte de luz c�nica
 struct SpotLight {
@@ -85,23 +85,22 @@ void main()
 	vec4 emissive = vec4(material.emissive, 1.0);
 
 	// C�lculo do efeito da ilumina��o no fragmento.
-	vec4 light[5];
+	vec4 light[4];
+	
 	// Contribui��o da fonte de luz ambiente
 	light[0] = calcAmbientLight(ambientLight);
+	
 	// Contribui��o da fonte de luz direcional
 	light[1] = calcDirectionalLight(directionalLight);
+	
 	// Contribui��o de cada fonte de luz Pontual
-	for(int i=0; i<2; i++)
-		light[i+2] = calcPointLight(pointLight[i]);
+	light[2] = calcPointLight(pointLight);
+	
 	// Contribui��o da fonte de luz c�nica
-	light[4] = /**/vec4(0.0)/**/;
+	light[3] = /**/vec4(0.0)/**/;
 
 	// C�lculo da cor final do fragmento.
-	// Com CubeMap
-	//fColor = (emissive + light[0] + light[1] + light[2] + light[3] + light[4]) * texture(cubeMap, textureVector);
-	// Com cor de fragmento
-	fColor = (emissive + light[0] + light[1] + light[2] + light[3] + light[4]) * vec4(1.0, 0.5, 0.5, 1.0);
-	//fColor = (emissive + light[0] + light[1] + light[2] + light[3] + light[4]) * texture(texture, uv);
+	fColor = (emissive + light[1] + vec4(0.2)) * texture(texSampler, uv);
 }
 
 vec4 calcAmbientLight(AmbientLight light) {

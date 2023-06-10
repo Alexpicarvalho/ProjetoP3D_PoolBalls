@@ -278,7 +278,7 @@ GLuint Obj::CreateShaderProgram() {
 
 	{
 		using namespace std;
-		//cout << sPositions << endl << sNormals << endl << sTexcoords;
+		cout << sPositions << " " << endl << sNormals << " " << endl << " " << sTexcoords << endl;
 	}
 	//	Configuramos os vertex attributes no shader program utilizando os 3 VBO's criados, o 1� para positions
 	// 2� para as normais e 3� para as coordenadas de textura
@@ -300,12 +300,16 @@ GLuint Obj::CreateShaderProgram() {
 
 	//Texture Handeling
 
-	GLint texture = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "texture");
+	GLint texture = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "texSampler");
 	glProgramUniform1i(shaderProgram, texture, 0);
 	return shaderProgram;
 }
 
-
+/// <summary>
+/// 
+/// </summary>
+/// <param name="position">ball pos</param>
+/// <param name="orientation">ball rotation</param>
 void Obj::Draw(glm::vec3 position, glm::vec3 orientation)
 {
 	using namespace glm;

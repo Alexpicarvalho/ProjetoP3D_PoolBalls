@@ -116,7 +116,6 @@ int main() {
 	Load::Obj obj;
 	objArray.push_back(obj);
 	obj.Read("poolballs/Ball1.obj");
-	//obj.Send();
 
 	lighting::Lights(&obj);
 
@@ -130,12 +129,10 @@ int main() {
 		glm::mat4 mvp = camera->projection * camera->view * model;
 
 		//glDrawArrays(GL_TRIANGLES, 0, 3); // NO INDEX BUFFER
+		//
 		//DrawTable(tableModel, mvp);
-		//for (auto obj : objArray)
-		//{
-		//cout << "." << endl;
-		obj.Draw(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-		//}
+		obj.Draw(glm::vec3(0.0f, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f));
+		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -149,8 +146,9 @@ int main() {
 void init() {
 	glClearColor(0.02f, 0.0f, 0.2f, 0.0f);
 	glEnable(GL_DEPTH_TEST);
-
-	glEnable(GL_CULL_FACE);
+	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LEQUAL);
+	glDepthRange(0.0f, 1.0f);
 }
 
 void DrawTable(std::vector<glm::vec3> tableModel, glm::mat4 mvp) {           // Testar se conseguimos ter o método de display legacy a funcionar simultâneamente com o modern OpenGL
