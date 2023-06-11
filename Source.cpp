@@ -30,11 +30,19 @@ vector<Load::Obj> objArray;
 
 //Propriedades da Mesa
 float tableThickness = 0.25f;    // Valores posteriormente divididos por 2,
-float tableWidth = 2.5f;        // sendo que os vértice mais longe um do outro são esse valor 
+float tableWidth = 2.5f;        // sendo que os vï¿½rtice mais longe um do outro sï¿½o esse valor 
 float tableLength = 4.0f;       // positivo e negativo
 float heightOffset = 0.0f;
+
 GLuint tableVBO, tableVAO;
 int tableVerticesCount;
+
+
+GLuint shaderProgram,
+sPositions,
+sNormals,
+sTexcoords;
+
 
 #define HEIGHT 1600
 #define WIDTH 900
@@ -71,17 +79,19 @@ int main() {
 	else cout << "Window is Working" << endl;
 
 	glfwMakeContextCurrent(window);
-	init();
+	
 	glewInit();
-	glfwSetKeyCallback(window, lighting::OnKeyPressed);
-
-	//Glew Init must be called only when context has been defined 
-
 	if (glewInit() != GLEW_OK) {
 		cout << "Failed to initialize GLEW" << endl;
 		return -1;
 	}
 	else cout << "Glew Initialized Successfully " << "\n GL Version: " << glGetString(GL_VERSION) << endl;
+	
+	init();
+	glfwSetKeyCallback(window, lighting::OnKeyPressed);
+
+	//Glew Init must be called only when context has been defined 
+
 
 	// Set up mouse input callbacks
 	glfwSetCursorPosCallback(window, onMouseMove);
@@ -130,14 +140,38 @@ int main() {
 		using namespace Load;
 
 
-		for (string i : objFiles)
+		/*for (string i : objFiles)
 		{
-			//cout << i << endl;
-		}
+			Load::Obj obj;
+			objArray.push_back(obj);
+			obj.Read(i, sPositions, sNormals, sTexcoords, shaderProgram);
+			obj.Send();
+			lighting::Lights(&obj, shaderProgram);
+		}*/
 	}
-	Load::Obj obj;
+	Load::Obj obj, obj1, obj2, obj3, obj4, obj5;
+	//objArray.push_back(obj);
+	obj.Read("poolballs/Ball1.obj", sPositions, sNormals, sTexcoords, shaderProgram);
+	obj1.Read("poolballs/Ball2.obj", sPositions, sNormals, sTexcoords, shaderProgram);
+	obj2.Read("poolballs/Ball3.obj", sPositions, sNormals, sTexcoords, shaderProgram);
+	obj3.Read("poolballs/Ball4.obj", sPositions, sNormals, sTexcoords, shaderProgram);
+	obj4.Read("poolballs/Ball4.obj", sPositions, sNormals, sTexcoords, shaderProgram);
+	obj5.Read("poolballs/Ball5.obj", sPositions, sNormals, sTexcoords, shaderProgram);
+	obj.Send();
+	obj1.Send();
+	obj2.Send();
+	obj3.Send();
+	obj4.Send();
+	obj5.Send();
+	lighting::Lights(&obj, shaderProgram);
+	lighting::Lights(&obj1, shaderProgram);
+	lighting::Lights(&obj2, shaderProgram);
+	lighting::Lights(&obj3, shaderProgram);
+	lighting::Lights(&obj4, shaderProgram);
+	lighting::Lights(&obj5, shaderProgram);
 	objArray.push_back(obj);
-	obj.Read("poolballs/Ball1.obj");
+
+
 
 	CreateTableModel();
 
@@ -145,8 +179,14 @@ int main() {
 	objArray.push_back(obj1);
 	obj1.Read("poolballs/Ball2.obj");*/
 
-	lighting::Lights(&obj);
 	//lighting::Lights(&obj1);
+
+	objArray.push_back(obj1);
+	objArray.push_back(obj2);
+	objArray.push_back(obj3);
+	objArray.push_back(obj4);
+	objArray.push_back(obj5);
+
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -158,11 +198,23 @@ int main() {
 
 		//glDrawArrays(GL_TRIANGLES, 0, 3); // NO INDEX BUFFER
 		//
+
 		DrawTable(tableModel, mvp);
 		//obj.Draw(glm::vec3(0.0f, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f), modelMatrix * zoomMatrix);
 		//obj1.Draw(glm::vec3(-2.0f, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f), modelMatrix);
 		
 		
+
+		//DrawTable(tableModel, mvp);
+		int i = -1;
+		for (auto& obj : objArray)
+		{
+			obj.Draw(glm::vec3(i++, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f));
+
+		}
+		//obj1.Draw(glm::vec3(3.0f, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f));
+
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -179,6 +231,27 @@ void init() {
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LEQUAL);
 	glDepthRange(0.0f, 1.0f);
+
+	ShaderInfo shaders[] = {
+	{ GL_VERTEX_SHADER,"VballShader.vert" },
+	{ GL_FRAGMENT_SHADER, "FballShader.frag" },
+	{ GL_NONE, NULL }   //GL_None marca o final da lista de shader info
+	};
+
+	//Shader ID
+	shaderProgram = LoadShaders(shaders);
+
+	glUseProgram(shaderProgram); // Associa este shader program ao corrent render state
+
+	sPositions = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "vertexPosition");
+	sNormals = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "vertexNormals");
+	sTexcoords = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "texCoords");
+
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "OpenGL Error: " << error << std::endl;
+	}
+
 }
 
 void onScroll(GLFWwindow* window, double xoffset, double yoffset) {
@@ -246,7 +319,7 @@ void SetupTableRendering() {
 
 }
 
-void DrawTable(std::vector<glm::vec3> tableModel, glm::mat4 mvp) {           // Testar se conseguimos ter o método de display legacy a funcionar simultâneamente com o modern OpenGL
+void DrawTable(std::vector<glm::vec3> tableModel, glm::mat4 mvp) {           // Testar se conseguimos ter o mï¿½todo de display legacy a funcionar simultï¿½neamente com o modern OpenGL
 	//cout << "oi";
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -262,11 +335,11 @@ void DrawTable(std::vector<glm::vec3> tableModel, glm::mat4 mvp) {           // 
 	for (int nv = 0; nv < 6 * 4 * 3; nv += 3) {
 
 		glm::vec4 vertex = glm::vec4(vertex_stream[nv], vertex_stream[nv + 1], vertex_stream[nv + 2], 1.0f);
-		// Cálculo das coordenadas de recorte
+		// Cï¿½lculo das coordenadas de recorte
 		glm::vec4 transformed_vertex = mvp * vertex;
-		// Divisão de Perspetiva
+		// Divisï¿½o de Perspetiva
 		glm::vec4 normalized_vertex = transformed_vertex / transformed_vertex.w;
-		// Desenho do vértice
+		// Desenho do vï¿½rtice
 		glVertex3f(normalized_vertex.x, normalized_vertex.y, normalized_vertex.z);
 	}
 	glEnd();
@@ -278,14 +351,14 @@ std::vector<glm::vec3> CreateTableModel() {
 	float lThickness = tableThickness / 2 + heightOffset;
 	float lLength = tableLength / 2;
 
-	glm::vec3 point[6 * 4] = {       //6 face com 4 vérices, para fazer um paralelepipedo
+	glm::vec3 point[6 * 4] = {       //6 face com 4 vï¿½rices, para fazer um paralelepipedo
 
 		// Frente
 		glm::vec3(-lWidth, -lThickness,  lLength),
 		glm::vec3(lWidth, -lThickness,  lLength),
 		glm::vec3(lWidth,  lThickness,  lLength),
 		glm::vec3(-lWidth,  lThickness,  lLength),
-		// Trás
+		// Trï¿½s
 		glm::vec3(-lWidth, -lThickness, -lLength),
 		glm::vec3(-lWidth,  lThickness, -lLength),
 		glm::vec3(lWidth,  lThickness, -lLength),
@@ -305,7 +378,7 @@ std::vector<glm::vec3> CreateTableModel() {
 		glm::vec3(lWidth,  lThickness,  lLength),
 		glm::vec3(lWidth,  lThickness, -lLength),
 		glm::vec3(-lWidth,  lThickness, -lLength),
-		// Lado de baixo (não tem necessáriamente que ser desenhado, uma vez que a câmera não se move)
+		// Lado de baixo (nï¿½o tem necessï¿½riamente que ser desenhado, uma vez que a cï¿½mera nï¿½o se move)
 		glm::vec3(-lWidth, -lThickness,  lLength),
 		glm::vec3(-lWidth, -lThickness, -lLength),
 		glm::vec3(lWidth, -lThickness, -lLength),

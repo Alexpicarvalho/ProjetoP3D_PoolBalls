@@ -196,7 +196,8 @@ RECENT REVISION HISTORY:
 // Some secondary priorities arise directly from the first two, some of which
 // provide more explicit reasons why performance can't be emphasized.
 //
-//    - Portable ("ease of use")
+//    - Por
+//  ("ease of use")
 //    - Small source code footprint ("easy to maintain")
 //    - No dependencies ("ease of use")
 //
