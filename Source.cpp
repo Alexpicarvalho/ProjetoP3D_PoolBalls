@@ -244,7 +244,7 @@ int main() {
 		int i = 0;
 		for (auto& obj : objArray)
 		{
-			obj.Draw(positions[i++], glm::vec3(0.0f, 0.0f, 0.0f));
+			obj.Draw(positions[i++], glm::vec3(0.0f, 0.0f, 0.0f), modelMatrix);
 		}
 		//obj1.Draw(glm::vec3(3.0f, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f));
 		DrawTable(tableModel, mvp );
