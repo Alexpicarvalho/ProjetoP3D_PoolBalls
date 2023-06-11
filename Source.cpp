@@ -228,7 +228,7 @@ int main() {
 		
 		//Criar a matriz MVP
 		glm::mat4 zoomMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(zoomLevel));
-		glm::mat4 mvp = camera->projection * camera->view * modelMatrix;
+		glm::mat4 mvp = camera->projection * camera->view * modelMatrix * zoomMatrix;
 
 		//glDrawArrays(GL_TRIANGLES, 0, 3); // NO INDEX BUFFER
 		//
@@ -244,7 +244,7 @@ int main() {
 		int i = 0;
 		for (auto& obj : objArray)
 		{
-			obj.Draw(positions[i++], glm::vec3(0.0f, 0.0f, 0.0f), modelMatrix);
+			obj.Draw(positions[i++], glm::vec3(0.0f, 0.0f, 0.0f), modelMatrix * zoomMatrix);
 		}
 		//obj1.Draw(glm::vec3(3.0f, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f));
 		DrawTable(tableModel, mvp );
