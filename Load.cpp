@@ -194,7 +194,8 @@ void Obj::ReadTexture(const std::string tex_fileName)
 
 	if (imageData)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, nChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, imageData);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
+			nChannels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, imageData);
 
 		glGenerateMipmap(GL_TEXTURE_2D);
 

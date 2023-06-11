@@ -64,29 +64,29 @@ std::vector<glm::vec3> _ballPositions = {
 
 vector<glm::vec3> positions = {
 	// First row
-	glm::vec3(0.0f, 1.0f, 0.0f),        // Cue ball (white)
-	glm::vec3(-2.0f, 1.0f, 3.0f),       // Ball 1 (yellow)
-	glm::vec3(2.0f, 1.0f, 3.0f),        // Ball 2 (blue)
+	glm::vec3(0.0f, 2.5f, 0.0f),        // Cue ball (white)
+	glm::vec3(-2.0f, 2.5f, 3.0f),       // Ball 1 (yellow)
+	glm::vec3(2.0f, 2.5f, 3.0f),        // Ball 2 (blue)
 
 	// Second row
-	glm::vec3(-1.0f, 1.0f, 5.0f),       // Ball 3 (red)
-	glm::vec3(3.0f, 1.0f, 5.0f),        // Ball 4 (purple)
-	glm::vec3(-3.0f, 1.0f, 7.0f),       // Ball 5 (orange)
-	glm::vec3(1.0f, 1.0f, 7.0f),        // Ball 6 (green)
+	glm::vec3(-1.0f, 2.5f, 5.0f),       // Ball 3 (red)
+	glm::vec3(3.0f, 2.5f, 5.0f),        // Ball 4 (purple)
+	glm::vec3(-3.0f, 2.5f, 7.0f),       // Ball 5 (orange)
+	glm::vec3(1.0f, 2.5f, 7.0f),        // Ball 6 (green)
 
 	// Third row
-	glm::vec3(-2.0f, 1.0f, 9.0f),       // Ball 7 (maroon)
-	glm::vec3(0.0f, 1.0f, 9.0f),        // Ball 8 (black)
-	glm::vec3(4.0f, 1.0f, 9.0f),        // Ball 9 (yellow-striped)
+	glm::vec3(-2.0f, 2.5f, 9.0f),       // Ball 7 (maroon)
+	glm::vec3(0.0f, 2.5f, 9.0f),        // Ball 8 (black)
+	glm::vec3(4.0f, 2.5f, 9.0f),        // Ball 9 (yellow-striped)
 
 	// Fourth row
-	glm::vec3(-1.5f, 1.0f, 11.0f),      // Ball 10 (blue-striped)
-	glm::vec3(2.5f, 1.0f, 11.0f),       // Ball 11 (red-striped)
-	glm::vec3(-2.5f, 1.0f, 13.0f),      // Ball 12 (purple-striped)
+	glm::vec3(-1.5f, 2.5f, 11.0f),      // Ball 10 (blue-striped)
+	glm::vec3(2.5f, 2.5f, 11.0f),       // Ball 11 (red-striped)
+	glm::vec3(-2.5f, 2.5f, 13.0f),      // Ball 12 (purple-striped)
 
 	// Fifth row
-	glm::vec3(-0.5f, 1.0f, 15.0f),      // Ball 13 (orange-striped)
-	glm::vec3(3.5f, 1.0f, 15.0f),       // Ball 14 (green-striped)
+	glm::vec3(-0.5f, 2.5f, 15.0f),      // Ball 13 (orange-striped)
+	glm::vec3(3.5f, 2.5f, 15.0f),       // Ball 14 (green-striped)
 	//glm::vec3(1.5f, 1.0f, 17.0f)        // Ball 15 (brown)
 };
 
@@ -166,7 +166,7 @@ int main() {
 			"poolballs/Ball15.obj"
 	};
 
-	/*{
+	{
 		using namespace Load;
 
 		int a = 0;
@@ -178,8 +178,8 @@ int main() {
 			lighting::Lights(&obj, shaderProgram);
 			objArray.push_back(obj);
 		}
-	}*/
-	Load::Obj obj, obj1, obj2, obj3, obj4, obj5;
+	}
+	/*Load::Obj obj, obj1, obj2, obj3, obj4, obj5;
 	obj.Read("poolballs/Ball1.obj", sPositions, sNormals, sTexcoords, sTexture, shaderProgram, 0);
 	obj1.Read("poolballs/Ball2.obj", sPositions, sNormals, sTexcoords, sTexture, shaderProgram, 1);
 	obj2.Read("poolballs/Ball3.obj", sPositions, sNormals, sTexcoords, sTexture, shaderProgram, 2);
@@ -201,7 +201,7 @@ int main() {
 	lighting::Lights(&obj4, shaderProgram);
 	lighting::Lights(&obj5, shaderProgram);
 
-	objArray.push_back(obj);
+	objArray.push_back(obj);*/
 
 
 	//Table
@@ -211,7 +211,7 @@ int main() {
 
 	/*Load::Obj obj1;
 	objArray.push_back(obj1);
-	obj1.Read("poolballs/Ball2.obj");*/
+	obj1.Read("poolballs/Ball2.obj");
 
 	//lighting::Lights(&obj1);
 
@@ -220,7 +220,7 @@ int main() {
 	objArray.push_back(obj3);
 	objArray.push_back(obj4);
 	objArray.push_back(obj5);
-
+	*/
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -282,7 +282,10 @@ void init() {
 	sTexcoords = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "texCoords");
 
 	sTexture = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "texSampler");
-	std::cout << sPositions << " " << std::endl << sNormals << " " << std::endl << sTexcoords << " " << std::endl;
+
+	/*std::cout << "vPosition: " << sPositions << " " <<
+		std::endl << "vTexture: " << sTexcoords << " " << std::endl << "vNormal: " << sNormals << " " << std::endl << "texture frag: " << sTexture << " " << std::endl;*/
+
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR) {
 		std::cout << "OpenGL Error: " << error << std::endl;
