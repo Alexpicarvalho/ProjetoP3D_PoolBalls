@@ -9,12 +9,14 @@
 
 using namespace Load;
 
-void Obj::Read(const std::string obj_model_filepath, GLuint posId, GLuint normId, GLuint texId, GLuint shader)
+void Obj::Read(const std::string obj_model_filepath, GLuint posId, GLuint normId, GLuint texId, GLuint textureBindId, GLuint shader, int counter)
 {
 	this->shaderProgram = shader;
 	this->posId = posId;
 	this->normId = normId;
 	this->texId = texId;
+	this->counter = counter;
+	this->textureBindID = textureBindId;
 
 	std::cout << "reading" << std::endl;
 	using namespace std;
@@ -168,11 +170,12 @@ void Obj::ReadMaterial(const std::string mtl_fileName)
 
 void Obj::ReadTexture(const std::string tex_fileName)
 {
-	GLuint textID = 0;
-
-	glGenTextures(1, &textID);
-
 	glActiveTexture(GL_TEXTURE0);
+
+	GLuint textID = counter;
+	textureID = textID;
+	
+	glGenTextures(1, &textID);
 
 	glBindTexture(GL_TEXTURE_2D, textID);
 
@@ -253,7 +256,6 @@ void Obj::Send(void)
 	}
 	//Debugging
 
-
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject[0]);
 	glVertexAttribPointer(posId, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
@@ -271,13 +273,7 @@ void Obj::Send(void)
 
 	//Texture Handeling
 
-	GLint texture = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "texSampler");
-	glProgramUniform1i(shaderProgram, texture, 0);
-
-	GLenum error = glGetError();
-	if (error != GL_NO_ERROR) {
-		std::cout << "OpenGL Error: " << error << std::endl;
-	}
+	glProgramUniform1i(shaderProgram, textureBindID, 0);
 }
 
 /// <summary>
@@ -313,6 +309,8 @@ void Obj::Draw(glm::vec3 position, glm::vec3 orientation)
 
 	GLint projectionId = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "Projection");
 	glProgramUniformMatrix4fv(shaderProgram, projectionId, 1, GL_FALSE, value_ptr(cam::Camera::GetInstance()->projection));
+
+	glBindTexture(GL_TEXTURE_2D, textureID + 1);
 
 	glBindVertexArray(vertexArrayObject);
 

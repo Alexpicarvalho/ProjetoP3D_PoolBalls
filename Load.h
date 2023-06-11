@@ -23,12 +23,11 @@ namespace Load {
 	class Obj
 	{
 	public:
-		void Read(const std::string, GLuint, GLuint, GLuint, GLuint);
+		void Read(const std::string, GLuint, GLuint, GLuint, GLuint, GLuint, int);
 		void ReadMaterial(const std::string);
 		void ReadTexture(const std::string);
 		void Send(void);
 		void Draw(glm::vec3, glm::vec3);
-		GLuint CreateShaderProgram();
 
 		glm::mat4 model;
 		GLuint shaderProgram;
@@ -52,6 +51,8 @@ namespace Load {
 
 		//buffers
 		GLuint posId, normId, texId, textureBindID;
+		GLuint textureID;
+		int counter;
 		GLuint vertexArrayObject;
 		GLuint vertexBufferObject[3]; // Cada tipo de data numa posi��o (0 = posi��o, 1 = normais, 2 = coordenadas da UV)
 

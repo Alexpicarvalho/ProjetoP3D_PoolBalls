@@ -32,7 +32,54 @@ float heightOffset = 0.0f;
 GLuint shaderProgram,
 sPositions,
 sNormals,
-sTexcoords;
+sTexcoords,
+sTexture;
+
+std::vector<glm::vec3> _ballPositions = {
+	glm::vec3(4.1f, 0.33f, 4.1f),        // bola 1
+	glm::vec3(-4.1f, 0.33f, -4.1f),        // bola 2
+	glm::vec3(-4.1f, 0.33f, 4.1f),        // bola 3
+	glm::vec3(4.1f, 0.33f, -4.1f),        // bola 4
+	glm::vec3(0.1f, 0.33f, -0.1f),        // bola 5
+	glm::vec3(-2.3f, 0.33f, -2.3f),        // bola 6
+	glm::vec3(-2.6f, 0.33f, -0.4f),        // bola 7
+	glm::vec3(1.8f, 0.33f, 1.2f),        // bola 8
+	glm::vec3(-4.8f, 0.33f, -2.2f),        // bola 9
+	glm::vec3(2.3f, 0.33f, 2.7f),        // bola 10
+	glm::vec3(-.2f, 0.33f, -2.8f),        // bola 11
+	glm::vec3(4.1f, 0.33f, -2.1f),        // bola 12
+	glm::vec3(-2.9f, 0.33f, 2.6f),        // bola 13
+	glm::vec3(2.1f, 0.33f, 3.3f),        // bola 14
+	glm::vec3(2.4f, 0.33f, -2.6f),        // bola 15
+};
+
+vector<glm::vec3> positions = {
+	// First row
+	glm::vec3(0.0f, 1.0f, 0.0f),        // Cue ball (white)
+	glm::vec3(-2.0f, 1.0f, 3.0f),       // Ball 1 (yellow)
+	glm::vec3(2.0f, 1.0f, 3.0f),        // Ball 2 (blue)
+
+	// Second row
+	glm::vec3(-1.0f, 1.0f, 5.0f),       // Ball 3 (red)
+	glm::vec3(3.0f, 1.0f, 5.0f),        // Ball 4 (purple)
+	glm::vec3(-3.0f, 1.0f, 7.0f),       // Ball 5 (orange)
+	glm::vec3(1.0f, 1.0f, 7.0f),        // Ball 6 (green)
+
+	// Third row
+	glm::vec3(-2.0f, 1.0f, 9.0f),       // Ball 7 (maroon)
+	glm::vec3(0.0f, 1.0f, 9.0f),        // Ball 8 (black)
+	glm::vec3(4.0f, 1.0f, 9.0f),        // Ball 9 (yellow-striped)
+
+	// Fourth row
+	glm::vec3(-1.5f, 1.0f, 11.0f),      // Ball 10 (blue-striped)
+	glm::vec3(2.5f, 1.0f, 11.0f),       // Ball 11 (red-striped)
+	glm::vec3(-2.5f, 1.0f, 13.0f),      // Ball 12 (purple-striped)
+
+	// Fifth row
+	glm::vec3(-0.5f, 1.0f, 15.0f),      // Ball 13 (orange-striped)
+	glm::vec3(3.5f, 1.0f, 15.0f),       // Ball 14 (green-striped)
+	//glm::vec3(1.5f, 1.0f, 17.0f)        // Ball 15 (brown)
+};
 
 #define HEIGHT 1600
 #define WIDTH 900
@@ -59,14 +106,14 @@ int main() {
 	else cout << "Window is Working" << endl;
 
 	glfwMakeContextCurrent(window);
-	
+
 	glewInit();
 	if (glewInit() != GLEW_OK) {
 		cout << "Failed to initialize GLEW" << endl;
 		return -1;
 	}
 	else cout << "Glew Initialized Successfully " << "\n GL Version: " << glGetString(GL_VERSION) << endl;
-	
+
 	init();
 	glfwSetKeyCallback(window, lighting::OnKeyPressed);
 
@@ -74,7 +121,7 @@ int main() {
 
 
 	vector<string> objFiles{
-		"poolballs/Ball1.obj",
+			"poolballs/Ball1.obj",
 			"poolballs/Ball2.obj",
 			"poolballs/Ball3.obj",
 			"poolballs/Ball4.obj",
@@ -91,58 +138,41 @@ int main() {
 			"poolballs/Ball15.obj"
 	};
 
-	vector<string> textureFiles
-	{
-		"poolballs/PoolBalluv1.jpg",
-			"poolballs/PoolBalluv2.jpg",
-			"poolballs/PoolBalluv3.jpg",
-			"poolballs/PoolBalluv4.jpg",
-			"poolballs/PoolBalluv5.jpg",
-			"poolballs/PoolBalluv6.jpg",
-			"poolballs/PoolBalluv7.jpg",
-			"poolballs/PoolBalluv8.jpg",
-			"poolballs/PoolBalluv9.jpg",
-			"poolballs/PoolBalluv10.jpg",
-			"poolballs/PoolBalluv11.jpg",
-			"poolballs/PoolBalluv12.jpg",
-			"poolballs/PoolBalluv13.jpg",
-			"poolballs/PoolBalluv14.jpg",
-			"poolballs/PoolBalluv15.jpg"
-	};
-
-	{
+	/*{
 		using namespace Load;
 
-
-		/*for (string i : objFiles)
+		int a = 0;
+		for (string i : objFiles)
 		{
 			Load::Obj obj;
-			objArray.push_back(obj);
-			obj.Read(i, sPositions, sNormals, sTexcoords, shaderProgram);
+			obj.Read(i, sPositions, sNormals, sTexcoords, sTexture, shaderProgram, a++);
 			obj.Send();
 			lighting::Lights(&obj, shaderProgram);
-		}*/
-	}
+			objArray.push_back(obj);
+		}
+	}*/
 	Load::Obj obj, obj1, obj2, obj3, obj4, obj5;
-	//objArray.push_back(obj);
-	obj.Read("poolballs/Ball1.obj", sPositions, sNormals, sTexcoords, shaderProgram);
-	obj1.Read("poolballs/Ball2.obj", sPositions, sNormals, sTexcoords, shaderProgram);
-	obj2.Read("poolballs/Ball3.obj", sPositions, sNormals, sTexcoords, shaderProgram);
-	obj3.Read("poolballs/Ball4.obj", sPositions, sNormals, sTexcoords, shaderProgram);
-	obj4.Read("poolballs/Ball4.obj", sPositions, sNormals, sTexcoords, shaderProgram);
-	obj5.Read("poolballs/Ball5.obj", sPositions, sNormals, sTexcoords, shaderProgram);
+	obj.Read("poolballs/Ball1.obj", sPositions, sNormals, sTexcoords, sTexture, shaderProgram, 0);
+	obj1.Read("poolballs/Ball2.obj", sPositions, sNormals, sTexcoords, sTexture, shaderProgram, 1);
+	obj2.Read("poolballs/Ball3.obj", sPositions, sNormals, sTexcoords, sTexture, shaderProgram, 2);
+	obj3.Read("poolballs/Ball4.obj", sPositions, sNormals, sTexcoords, sTexture, shaderProgram, 3);
+	obj4.Read("poolballs/Ball5.obj", sPositions, sNormals, sTexcoords, sTexture, shaderProgram, 4);
+	obj5.Read("poolballs/Ball6.obj", sPositions, sNormals, sTexcoords, sTexture, shaderProgram, 5);
+
 	obj.Send();
 	obj1.Send();
 	obj2.Send();
 	obj3.Send();
 	obj4.Send();
 	obj5.Send();
+
 	lighting::Lights(&obj, shaderProgram);
 	lighting::Lights(&obj1, shaderProgram);
 	lighting::Lights(&obj2, shaderProgram);
 	lighting::Lights(&obj3, shaderProgram);
 	lighting::Lights(&obj4, shaderProgram);
 	lighting::Lights(&obj5, shaderProgram);
+
 	objArray.push_back(obj);
 	objArray.push_back(obj1);
 	objArray.push_back(obj2);
@@ -162,11 +192,10 @@ int main() {
 		//glDrawArrays(GL_TRIANGLES, 0, 3); // NO INDEX BUFFER
 		//
 		//DrawTable(tableModel, mvp);
-		int i = -1;
+		int i =0;
 		for (auto& obj : objArray)
 		{
-			obj.Draw(glm::vec3(i++, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f));
-
+			obj.Draw(positions[i++], glm::vec3(0.0f, 0.0f, 0.0f));
 		}
 		//obj1.Draw(glm::vec3(3.0f, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
@@ -202,6 +231,8 @@ void init() {
 	sNormals = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "vertexNormals");
 	sTexcoords = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "texCoords");
 
+	sTexture = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "texSampler");
+	std::cout << sPositions << " " << std::endl << sNormals << " " << std::endl << sTexcoords << " " << std::endl;
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR) {
 		std::cout << "OpenGL Error: " << error << std::endl;
