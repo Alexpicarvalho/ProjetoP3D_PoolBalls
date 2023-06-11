@@ -281,11 +281,11 @@ void Obj::Send(void)
 /// </summary>
 /// <param name="position">ball pos</param>
 /// <param name="orientation">ball rotation</param>
-void Obj::Draw(glm::vec3 position, glm::vec3 orientation)
+void Obj::Draw(glm::vec3 position, glm::vec3 orientation, glm::mat4 modelMatrix)
 {
 	using namespace glm;
-	model = glm::mat4(1.0f);
-	mat4 tempModel = model;
+	//model = glm::mat4(1.0f);
+	mat4 tempModel = modelMatrix;
 
 	tempModel = translate(tempModel, position);
 

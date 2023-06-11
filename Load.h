@@ -26,6 +26,9 @@ namespace Load {
 		void Read(const std::string, GLuint, GLuint, GLuint, GLuint, GLuint, int);
 		void ReadMaterial(const std::string);
 		void ReadTexture(const std::string);
+
+		void Draw(glm::vec3, glm::vec3,glm::mat4 );
+
 		void Send(void);
 		void Draw(glm::vec3, glm::vec3);
 
