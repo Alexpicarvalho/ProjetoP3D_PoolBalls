@@ -29,6 +29,10 @@ float tableWidth = 2.5f;        // sendo que os vértice mais longe um do outro s
 float tableLength = 4.0f;       // positivo e negativo
 float heightOffset = 0.0f;
 
+GLuint shaderProgram,
+sPositions,
+sNormals,
+sTexcoords;
 
 #define HEIGHT 1600
 #define WIDTH 900
@@ -55,17 +59,19 @@ int main() {
 	else cout << "Window is Working" << endl;
 
 	glfwMakeContextCurrent(window);
-	init();
+	
 	glewInit();
-	glfwSetKeyCallback(window, lighting::OnKeyPressed);
-
-	//Glew Init must be called only when context has been defined 
-
 	if (glewInit() != GLEW_OK) {
 		cout << "Failed to initialize GLEW" << endl;
 		return -1;
 	}
 	else cout << "Glew Initialized Successfully " << "\n GL Version: " << glGetString(GL_VERSION) << endl;
+	
+	init();
+	glfwSetKeyCallback(window, lighting::OnKeyPressed);
+
+	//Glew Init must be called only when context has been defined 
+
 
 	vector<string> objFiles{
 		"poolballs/Ball1.obj",
@@ -108,16 +114,41 @@ int main() {
 		using namespace Load;
 
 
-		for (string i : objFiles)
+		/*for (string i : objFiles)
 		{
-			//cout << i << endl;
-		}
+			Load::Obj obj;
+			objArray.push_back(obj);
+			obj.Read(i, sPositions, sNormals, sTexcoords, shaderProgram);
+			obj.Send();
+			lighting::Lights(&obj, shaderProgram);
+		}*/
 	}
-	Load::Obj obj;
+	Load::Obj obj, obj1, obj2, obj3, obj4, obj5;
+	//objArray.push_back(obj);
+	obj.Read("poolballs/Ball1.obj", sPositions, sNormals, sTexcoords, shaderProgram);
+	obj1.Read("poolballs/Ball2.obj", sPositions, sNormals, sTexcoords, shaderProgram);
+	obj2.Read("poolballs/Ball3.obj", sPositions, sNormals, sTexcoords, shaderProgram);
+	obj3.Read("poolballs/Ball4.obj", sPositions, sNormals, sTexcoords, shaderProgram);
+	obj4.Read("poolballs/Ball4.obj", sPositions, sNormals, sTexcoords, shaderProgram);
+	obj5.Read("poolballs/Ball5.obj", sPositions, sNormals, sTexcoords, shaderProgram);
+	obj.Send();
+	obj1.Send();
+	obj2.Send();
+	obj3.Send();
+	obj4.Send();
+	obj5.Send();
+	lighting::Lights(&obj, shaderProgram);
+	lighting::Lights(&obj1, shaderProgram);
+	lighting::Lights(&obj2, shaderProgram);
+	lighting::Lights(&obj3, shaderProgram);
+	lighting::Lights(&obj4, shaderProgram);
+	lighting::Lights(&obj5, shaderProgram);
 	objArray.push_back(obj);
-	obj.Read("poolballs/Ball1.obj");
-
-	lighting::Lights(&obj);
+	objArray.push_back(obj1);
+	objArray.push_back(obj2);
+	objArray.push_back(obj3);
+	objArray.push_back(obj4);
+	objArray.push_back(obj5);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -131,8 +162,14 @@ int main() {
 		//glDrawArrays(GL_TRIANGLES, 0, 3); // NO INDEX BUFFER
 		//
 		//DrawTable(tableModel, mvp);
-		obj.Draw(glm::vec3(0.0f, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f));
-		
+		int i = -1;
+		for (auto& obj : objArray)
+		{
+			obj.Draw(glm::vec3(i++, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f));
+
+		}
+		//obj1.Draw(glm::vec3(3.0f, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f));
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -149,6 +186,27 @@ void init() {
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LEQUAL);
 	glDepthRange(0.0f, 1.0f);
+
+	ShaderInfo shaders[] = {
+	{ GL_VERTEX_SHADER,"VballShader.vert" },
+	{ GL_FRAGMENT_SHADER, "FballShader.frag" },
+	{ GL_NONE, NULL }   //GL_None marca o final da lista de shader info
+	};
+
+	//Shader ID
+	shaderProgram = LoadShaders(shaders);
+
+	glUseProgram(shaderProgram); // Associa este shader program ao corrent render state
+
+	sPositions = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "vertexPosition");
+	sNormals = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "vertexNormals");
+	sTexcoords = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "texCoords");
+
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "OpenGL Error: " << error << std::endl;
+	}
+
 }
 
 void DrawTable(std::vector<glm::vec3> tableModel, glm::mat4 mvp) {           // Testar se conseguimos ter o método de display legacy a funcionar simultâneamente com o modern OpenGL

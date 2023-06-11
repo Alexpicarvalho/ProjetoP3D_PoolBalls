@@ -23,10 +23,10 @@ namespace Load {
 	class Obj
 	{
 	public:
-		void Read(const std::string);
+		void Read(const std::string, GLuint, GLuint, GLuint, GLuint);
 		void ReadMaterial(const std::string);
 		void ReadTexture(const std::string);
-		GLuint Send(void);
+		void Send(void);
 		void Draw(glm::vec3, glm::vec3);
 		GLuint CreateShaderProgram();
 
@@ -40,17 +40,18 @@ namespace Load {
 
 		glm::vec3 ka, kd, ks;
 		GLfloat ns;
-	private : 
+	private:
 
 		//Vertex data types
 		std::vector < glm::vec3> positions;
 		std::vector < glm::vec3> normals;
 		std::vector < glm::vec2> texcoords;
-		std::vector < Face> faces; 
+		std::vector < Face> faces;
 
 		//std::vector<VertexData> vertData;
 
 		//buffers
+		GLuint posId, normId, texId, textureBindID;
 		GLuint vertexArrayObject;
 		GLuint vertexBufferObject[3]; // Cada tipo de data numa posi��o (0 = posi��o, 1 = normais, 2 = coordenadas da UV)
 

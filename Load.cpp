@@ -9,8 +9,13 @@
 
 using namespace Load;
 
-void Obj::Read(const std::string obj_model_filepath)
+void Obj::Read(const std::string obj_model_filepath, GLuint posId, GLuint normId, GLuint texId, GLuint shader)
 {
+	this->shaderProgram = shader;
+	this->posId = posId;
+	this->normId = normId;
+	this->texId = texId;
+
 	std::cout << "reading" << std::endl;
 	using namespace std;
 	ifstream file(obj_model_filepath);
@@ -196,10 +201,10 @@ void Obj::ReadTexture(const std::string tex_fileName)
 }
 
 
-GLuint Obj::Send(void)
+void Obj::Send(void)
 {
 	GLfloat lPositions[8064 * 3 * 3];
-	GLfloat lNormals[8064  * 3 * 3];
+	GLfloat lNormals[8064 * 3 * 3];
 	GLfloat lTextureCoords[8064 * 2 * 3];
 
 	//vamos iterar por cada vertice no array de Data
@@ -248,61 +253,31 @@ GLuint Obj::Send(void)
 	}
 	//Debugging
 
-	GLenum error = glGetError();
-	if (error != GL_NO_ERROR) {
-		std::cout << "OpenGL Error: " << error << std::endl;
-	}
-
-	return Obj::CreateShaderProgram();
-}
-
-GLuint Obj::CreateShaderProgram() {
-
-	ShaderInfo shaders[] = {
-	{ GL_VERTEX_SHADER,"VballShader.vert" },
-	{ GL_FRAGMENT_SHADER, "FballShader.frag" },
-	{ GL_NONE, NULL }   //GL_None marca o final da lista de shader info
-	};
-
-	//Shader ID
-	GLuint shaderProgram = LoadShaders(shaders);
-	this->shaderProgram = shaderProgram;
-
-	glUseProgram(shaderProgram); // Associa este shader program ao corrent render state
-
-
-	//Localiza��es (pointers) dos atributos dos v�rtices no shader
-	GLuint sPositions = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "vertexPosition"); //CONFIRMAR NOMES DENTRO DO VERTEX E FRAGMENT
-	GLuint sNormals = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "vertexNormals");	// SHADERS
-	GLuint sTexcoords = glGetProgramResourceLocation(shaderProgram, GL_PROGRAM_INPUT, "texCoords");
-
-	{
-		using namespace std;
-		cout << sPositions << " " << endl << sNormals << " " << endl << " " << sTexcoords << endl;
-	}
-	//	Configuramos os vertex attributes no shader program utilizando os 3 VBO's criados, o 1� para positions
-	// 2� para as normais e 3� para as coordenadas de textura
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject[0]);
-	glVertexAttribPointer(sPositions, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+	glVertexAttribPointer(posId, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject[1]);
-	glVertexAttribPointer(sNormals, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+	glVertexAttribPointer(normId, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject[2]);
-	glVertexAttribPointer(sTexcoords, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+	glVertexAttribPointer(texId, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
 	//Enable nos atributos
 
-	glEnableVertexAttribArray(sPositions);
-	glEnableVertexAttribArray(sNormals);
-	glEnableVertexAttribArray(sTexcoords);
+	glEnableVertexAttribArray(posId);
+	glEnableVertexAttribArray(normId);
+	glEnableVertexAttribArray(texId);
 
 	//Texture Handeling
 
 	GLint texture = glGetProgramResourceLocation(shaderProgram, GL_UNIFORM, "texSampler");
 	glProgramUniform1i(shaderProgram, texture, 0);
-	return shaderProgram;
+
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "OpenGL Error: " << error << std::endl;
+	}
 }
 
 /// <summary>

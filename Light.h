@@ -10,13 +10,13 @@ namespace lighting
 {
 	bool light[] = { true, true, true, true };
 
-	void Lights(Load::Obj* obj);
+	void Lights(Load::Obj* obj, GLuint);
 	void OnKeyPressed(GLFWwindow* window, int key, int scancode, int action, int mods);
 	glm::vec3 black = glm::vec3(0, 0, 0);
 
-	void lighting::Lights(Load::Obj* obj)
+	void lighting::Lights(Load::Obj* obj, GLuint shader)
 	{
-		GLuint shaderProgram = obj->Send();
+		GLuint shaderProgram = shader;
 		
 		//ambient
 		if (light[0])
