@@ -241,6 +241,7 @@ int main() {
 
 		//DrawTable(tableModel, mvp);
 		glUseProgram(shaderProgram);
+		int i = 0;
 		for (auto& obj : objArray)
 		{
 			obj.Draw(positions[i++], glm::vec3(0.0f, 0.0f, 0.0f));
