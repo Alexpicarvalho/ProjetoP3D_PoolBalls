@@ -27,7 +27,7 @@ namespace Load {
 		void ReadMaterial(const std::string);
 		void ReadTexture(const std::string);
 		GLuint Send(void);
-		void Draw(glm::vec3, glm::vec3);
+		void Draw(glm::vec3, glm::vec3,glm::mat4 );
 		GLuint CreateShaderProgram();
 
 		glm::mat4 model;

@@ -20,19 +20,35 @@ using namespace std;
 
 
 void init(void);
-void DrawTable(std::vector<glm::vec3> tableModel, glm::mat4 mvp);
+void DrawTable(std::vector<glm::vec3> , glm::mat4 );
+void onMouseMove(GLFWwindow* , double , double );
+void onMouseButton(GLFWwindow* , int , int , int );
+void onScroll(GLFWwindow* , double , double );
+void SetupTableRendering();
 std::vector<glm::vec3> CreateTableModel();
 vector<Load::Obj> objArray;
+
 //Propriedades da Mesa
 float tableThickness = 0.25f;    // Valores posteriormente divididos por 2,
 float tableWidth = 2.5f;        // sendo que os vértice mais longe um do outro são esse valor 
 float tableLength = 4.0f;       // positivo e negativo
 float heightOffset = 0.0f;
-
+GLuint tableVBO, tableVAO;
+int tableVerticesCount;
 
 #define HEIGHT 1600
 #define WIDTH 900
-//Properties
+
+//View Movemnt
+glm::mat4 modelMatrix = glm::mat4(1.0f);
+double lastMouseX = 0;
+double lastMouseY = 0;
+bool isMouseDragging = false;
+
+// Zoom level
+float zoomLevel = 1.0f;
+
+
 float angle = 0.0f;
 
 int main() {
@@ -66,6 +82,12 @@ int main() {
 		return -1;
 	}
 	else cout << "Glew Initialized Successfully " << "\n GL Version: " << glGetString(GL_VERSION) << endl;
+
+	// Set up mouse input callbacks
+	glfwSetCursorPosCallback(window, onMouseMove);
+	glfwSetMouseButtonCallback(window, onMouseButton);
+	glfwSetScrollCallback(window, onScroll);
+
 
 	vector<string> objFiles{
 		"poolballs/Ball1.obj",
@@ -117,21 +139,29 @@ int main() {
 	objArray.push_back(obj);
 	obj.Read("poolballs/Ball1.obj");
 
+	CreateTableModel();
+
+	/*Load::Obj obj1;
+	objArray.push_back(obj1);
+	obj1.Read("poolballs/Ball2.obj");*/
+
 	lighting::Lights(&obj);
+	//lighting::Lights(&obj1);
 
 	while (!glfwWindowShouldClose(window))
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//Model matrix = identidade
-		glm::mat4 model = glm::mat4(1.0f);
-
+		
 		//Criar a matriz MVP
-		glm::mat4 mvp = camera->projection * camera->view * model;
+		glm::mat4 zoomMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(zoomLevel));
+		glm::mat4 mvp = camera->projection * camera->view * modelMatrix;
 
 		//glDrawArrays(GL_TRIANGLES, 0, 3); // NO INDEX BUFFER
 		//
-		//DrawTable(tableModel, mvp);
-		obj.Draw(glm::vec3(0.0f, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f));
+		DrawTable(tableModel, mvp);
+		//obj.Draw(glm::vec3(0.0f, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f), modelMatrix * zoomMatrix);
+		//obj1.Draw(glm::vec3(-2.0f, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f), modelMatrix);
+		
 		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -149,6 +179,71 @@ void init() {
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LEQUAL);
 	glDepthRange(0.0f, 1.0f);
+}
+
+void onScroll(GLFWwindow* window, double xoffset, double yoffset) {
+	// Update zoom level based on scroll offset
+	float zoomAmount = 0.1f;
+	zoomLevel += yoffset * zoomAmount;
+
+	// Clamp zoom level to a sensible range if desired
+	// zoomLevel = glm::clamp(zoomLevel, 0.1f, 10.0f);
+}
+// Callback function for mouse movement event
+void onMouseMove(GLFWwindow* window, double xpos, double ypos) {
+	if (isMouseDragging) {
+		// Calculate mouse movement
+		double deltaX = xpos - lastMouseX;
+		double deltaY = ypos - lastMouseY;
+
+		// Apply rotation to the model matrix
+		glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians((float)deltaX), glm::vec3(0.0f, 1.0f, 0.0f));
+		rotation = glm::rotate(rotation, glm::radians((float)deltaY), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelMatrix = rotation * modelMatrix;
+
+		// Update last mouse position
+		lastMouseX = xpos;
+		lastMouseY = ypos;
+	}
+}
+
+// Callback function for mouse button event
+void onMouseButton(GLFWwindow* window, int button, int action, int mods) {
+	if (button == GLFW_MOUSE_BUTTON_LEFT) {
+		if (action == GLFW_PRESS) {
+			isMouseDragging = true;
+			glfwGetCursorPos(window, &lastMouseX, &lastMouseY);
+		}
+		else if (action == GLFW_RELEASE) {
+			isMouseDragging = false;
+		}
+	}
+}
+
+void SetupTableRendering() {
+
+	// Create and bind the VAO
+	glGenVertexArrays(1, &tableVAO);
+	glBindVertexArray(tableVAO);
+
+	// Create the VBO and upload the table model data
+	glGenBuffers(1, &tableVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, tableVBO);
+
+	std::vector<glm::vec3> tableModel = CreateTableModel();
+	tableVerticesCount = tableModel.size();
+
+	glBufferData(GL_ARRAY_BUFFER, tableModel.size() * sizeof(glm::vec3), tableModel.data(), GL_STATIC_DRAW);
+
+	// Specify the vertex attribute pointers
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+
+	// Unbind the VAO and VBO
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
 }
 
 void DrawTable(std::vector<glm::vec3> tableModel, glm::mat4 mvp) {           // Testar se conseguimos ter o método de display legacy a funcionar simultâneamente com o modern OpenGL
