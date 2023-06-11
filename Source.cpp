@@ -29,9 +29,9 @@ std::vector<glm::vec3> CreateTableModel();
 vector<Load::Obj> objArray;
 
 //Propriedades da Mesa
-float tableThickness = 0.25f;    // Valores posteriormente divididos por 2,
-float tableWidth = 2.5f;        // sendo que os v�rtice mais longe um do outro s�o esse valor 
-float tableLength = 4.0f;       // positivo e negativo
+float tableThickness = 3.0f;    // Valores posteriormente divididos por 2,
+float tableWidth = 25.0f;        // sendo que os v�rtice mais longe um do outro s�o esse valor 
+float tableLength = 50.0f;       // positivo e negativo
 float heightOffset = 0.0f;
 
 GLuint tableVBO, tableVAO;
@@ -42,6 +42,8 @@ GLuint shaderProgram,
 sPositions,
 sNormals,
 sTexcoords;
+
+GLuint tableShader;
 
 
 #define HEIGHT 1600
@@ -151,6 +153,8 @@ int main() {
 	}
 	Load::Obj obj, obj1, obj2, obj3, obj4, obj5;
 	//objArray.push_back(obj);
+
+
 	obj.Read("poolballs/Ball1.obj", sPositions, sNormals, sTexcoords, shaderProgram);
 	obj1.Read("poolballs/Ball2.obj", sPositions, sNormals, sTexcoords, shaderProgram);
 	obj2.Read("poolballs/Ball3.obj", sPositions, sNormals, sTexcoords, shaderProgram);
@@ -172,8 +176,10 @@ int main() {
 	objArray.push_back(obj);
 
 
+	//Table
+	SetupTableRendering();
 
-	CreateTableModel();
+
 
 	/*Load::Obj obj1;
 	objArray.push_back(obj1);
@@ -199,21 +205,22 @@ int main() {
 		//glDrawArrays(GL_TRIANGLES, 0, 3); // NO INDEX BUFFER
 		//
 
-		DrawTable(tableModel, mvp);
+		
 		//obj.Draw(glm::vec3(0.0f, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f), modelMatrix * zoomMatrix);
 		//obj1.Draw(glm::vec3(-2.0f, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f), modelMatrix);
 		
 		
 
 		//DrawTable(tableModel, mvp);
+		glUseProgram(shaderProgram);
 		int i = -1;
 		for (auto& obj : objArray)
 		{
-			obj.Draw(glm::vec3(i++, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f));
+			obj.Draw(glm::vec3(i++, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f), modelMatrix);
 
 		}
 		//obj1.Draw(glm::vec3(3.0f, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f));
-
+		DrawTable(tableModel, mvp );
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -251,6 +258,16 @@ void init() {
 	if (error != GL_NO_ERROR) {
 		std::cout << "OpenGL Error: " << error << std::endl;
 	}
+
+	ShaderInfo tableShaders[] = {
+	{ GL_VERTEX_SHADER,"TableShader.vert" },
+	{ GL_FRAGMENT_SHADER, "TableShader.frag" },
+	{ GL_NONE, NULL }   //GL_None marca o final da lista de shader info
+	};
+
+
+	//Shader ID
+	tableShader = LoadShaders(tableShaders);
 
 }
 
@@ -306,43 +323,24 @@ void SetupTableRendering() {
 	std::vector<glm::vec3> tableModel = CreateTableModel();
 	tableVerticesCount = tableModel.size();
 
-	glBufferData(GL_ARRAY_BUFFER, tableModel.size() * sizeof(glm::vec3), tableModel.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, tableModel.size() * sizeof(glm::vec3), &tableModel[0], GL_STATIC_DRAW);
 
 	// Specify the vertex attribute pointers
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), nullptr);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
 
 	// Unbind the VAO and VBO
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-
 }
 
 void DrawTable(std::vector<glm::vec3> tableModel, glm::mat4 mvp) {           // Testar se conseguimos ter o m�todo de display legacy a funcionar simult�neamente com o modern OpenGL
-	//cout << "oi";
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	float* vertex_stream = static_cast<float*>(glm::value_ptr(tableModel.front()));
-
-	//Desenhar a mesa 
-
-	glBegin(GL_QUADS);
-
-	//Selecionar a cor
-	glColor3f(0.0f, 0.7f, 0.3f);
-
-	for (int nv = 0; nv < 6 * 4 * 3; nv += 3) {
-
-		glm::vec4 vertex = glm::vec4(vertex_stream[nv], vertex_stream[nv + 1], vertex_stream[nv + 2], 1.0f);
-		// C�lculo das coordenadas de recorte
-		glm::vec4 transformed_vertex = mvp * vertex;
-		// Divis�o de Perspetiva
-		glm::vec4 normalized_vertex = transformed_vertex / transformed_vertex.w;
-		// Desenho do v�rtice
-		glVertex3f(normalized_vertex.x, normalized_vertex.y, normalized_vertex.z);
-	}
-	glEnd();
+	
+	glUseProgram(tableShader);
+	glBindVertexArray(tableVAO);
+	glUniformMatrix4fv(glGetUniformLocation(tableShader, "mvp"), 1, false, glm::value_ptr(mvp));
+	glDrawArrays(GL_QUADS, 0, tableModel.size());
+	glUseProgram(0);
 }
 
 std::vector<glm::vec3> CreateTableModel() {
@@ -351,46 +349,45 @@ std::vector<glm::vec3> CreateTableModel() {
 	float lThickness = tableThickness / 2 + heightOffset;
 	float lLength = tableLength / 2;
 
-	glm::vec3 point[6 * 4] = {       //6 face com 4 v�rices, para fazer um paralelepipedo
+	std::vector<glm::vec3> tableModel = {       //6 face com 4 v�rices, para fazer um paralelepipedo
 
 		// Frente
 		glm::vec3(-lWidth, -lThickness,  lLength),
 		glm::vec3(lWidth, -lThickness,  lLength),
 		glm::vec3(lWidth,  lThickness,  lLength),
 		glm::vec3(-lWidth,  lThickness,  lLength),
+
 		// Tr�s
 		glm::vec3(-lWidth, -lThickness, -lLength),
 		glm::vec3(-lWidth,  lThickness, -lLength),
 		glm::vec3(lWidth,  lThickness, -lLength),
 		glm::vec3(lWidth, -lThickness, -lLength),
+
 		// Lado Esquerdo
 		glm::vec3(-lWidth, -lThickness,  lLength),
 		glm::vec3(-lWidth,  lThickness,  lLength),
 		glm::vec3(-lWidth,  lThickness, -lLength),
 		glm::vec3(-lWidth, -lThickness, -lLength),
+
 		// Lado Direito
 		glm::vec3(lWidth, -lThickness,  lLength),
 		glm::vec3(lWidth, -lThickness, -lLength),
 		glm::vec3(lWidth,  lThickness, -lLength),
 		glm::vec3(lWidth,  lThickness,  lLength),
+
 		// Lado de cima
 		glm::vec3(-lWidth,  lThickness,  lLength),
 		glm::vec3(lWidth,  lThickness,  lLength),
 		glm::vec3(lWidth,  lThickness, -lLength),
 		glm::vec3(-lWidth,  lThickness, -lLength),
-		// Lado de baixo (n�o tem necess�riamente que ser desenhado, uma vez que a c�mera n�o se move)
+
+		// Lado de baixo 
 		glm::vec3(-lWidth, -lThickness,  lLength),
 		glm::vec3(-lWidth, -lThickness, -lLength),
 		glm::vec3(lWidth, -lThickness, -lLength),
 		glm::vec3(lWidth, -lThickness,  lLength)
+
 	};
-
-	std::vector<glm::vec3> tableModel;
-
-	for (auto i : point)
-	{
-		tableModel.push_back(i);
-	}
 
 	return tableModel;
 }
