@@ -32,6 +32,7 @@ namespace Load {
 
 		glm::mat4 model;
 		GLuint shaderProgram;
+		glm::vec3 currentPosition;
 
 		//Ball Object
 		//ball::Ball thisBall; 

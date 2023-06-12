@@ -17,6 +17,8 @@ void Obj::Read(const std::string obj_model_filepath, GLuint posId, GLuint normId
 	this->texId = texId;
 	this->counter = counter;
 	this->textureBindID = textureBindId;
+	/*ball::Ball ballCollider;
+	this->thisBall = ballCollider;*/
 
 	std::cout << "reading" << std::endl;
 	using namespace std;
@@ -287,6 +289,7 @@ void Obj::Draw(glm::vec3 position, glm::vec3 orientation, glm::mat4 modelMatrix)
 	using namespace glm;
 	//model = glm::mat4(1.0f);
 	mat4 tempModel = modelMatrix;
+	currentPosition = position;
 
 	tempModel = translate(tempModel, position);
 

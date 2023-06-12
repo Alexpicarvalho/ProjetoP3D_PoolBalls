@@ -24,9 +24,21 @@ void DrawTable(std::vector<glm::vec3> , glm::mat4 );
 void onMouseMove(GLFWwindow* , double , double );
 void onMouseButton(GLFWwindow* , int , int , int );
 void onScroll(GLFWwindow* , double , double );
+void onSpaceClick(GLFWwindow*, int, int, int, int);
 void SetupTableRendering();
+bool checkCollisions();
 std::vector<glm::vec3> CreateTableModel();
 vector<Load::Obj> objArray;
+
+//Propriedades do Movimento da Bola
+float moveSpeed = 1.0f;
+float rotationSpeed = 1.0f;
+float ballRadius = 1.0f;
+float initialDirectionalPosition = 0.0f;
+bool ballIsMoving = false;
+bool fullStop = false;
+
+
 
 //Propriedades da Mesa
 float tableThickness = 3.0f;    // Valores posteriormente divididos por 2,
@@ -44,56 +56,66 @@ sNormals,
 sTexcoords,
 sTexture;
 
-std::vector<glm::vec3> _ballPositions = {
-	glm::vec3(4.1f, 0.33f, 4.1f),        // bola 1
-	glm::vec3(-4.1f, 0.33f, -4.1f),        // bola 2
-	glm::vec3(-4.1f, 0.33f, 4.1f),        // bola 3
-	glm::vec3(4.1f, 0.33f, -4.1f),        // bola 4
-	glm::vec3(0.1f, 0.33f, -0.1f),        // bola 5
-	glm::vec3(-2.3f, 0.33f, -2.3f),        // bola 6
-	glm::vec3(-2.6f, 0.33f, -0.4f),        // bola 7
-	glm::vec3(1.8f, 0.33f, 1.2f),        // bola 8
-	glm::vec3(-4.8f, 0.33f, -2.2f),        // bola 9
-	glm::vec3(2.3f, 0.33f, 2.7f),        // bola 10
-	glm::vec3(-.2f, 0.33f, -2.8f),        // bola 11
-	glm::vec3(4.1f, 0.33f, -2.1f),        // bola 12
-	glm::vec3(-2.9f, 0.33f, 2.6f),        // bola 13
-	glm::vec3(2.1f, 0.33f, 3.3f),        // bola 14
-	glm::vec3(2.4f, 0.33f, -2.6f),        // bola 15
-};
-
 vector<glm::vec3> positions = {
 	// First row
-	glm::vec3(0.0f, 2.5f, 0.0f),        // Cue ball (white)
-	glm::vec3(-2.0f, 2.5f, 3.0f),       // Ball 1 (yellow)
-	glm::vec3(2.0f, 2.5f, 3.0f),        // Ball 2 (blue)
+	glm::vec3(.0f, 2.5f, -12.0f),       //Ball1
+	glm::vec3(-2.0f, 2.5f, 3.0f),       //Ball2
+	glm::vec3(2.0f, 2.5f, 3.0f),        //Ball3
+										
+	// Second row						
+	glm::vec3(-1.0f, 2.5f, 5.0f),       //Ball4
+	glm::vec3(3.0f, 2.5f, 5.0f),        //Ball5
+	glm::vec3(-3.0f, 2.5f, 7.0f),       //Ball6
+	glm::vec3(1.0f, 2.5f, 7.0f),        //Ball7
+										
+	// Third row						
+	glm::vec3(-2.0f, 2.5f, 9.0f),       //Ball8
+	glm::vec3(0.0f, 2.5f, 9.0f),        //Ball9
+	glm::vec3(4.0f, 2.5f, 9.0f),        //Ball10
+										
+	// Fourth row						
+	glm::vec3(-1.5f, 2.5f, 11.0f),      //Ball11
+	glm::vec3(2.5f, 2.5f, 11.0f),       //Ball12
+	glm::vec3(-2.5f, 2.5f, 13.0f),      //Ball13
+										
+	// Fifth row						
+	glm::vec3(-0.5f, 2.5f, 15.0f),      //Ball14
+	glm::vec3(3.5f, 2.5f, 15.0f),       //Ball15
+	//glm::vec3(1.5f, 1.0f, 17.0f)      //Ball
+};
 
-	// Second row
-	glm::vec3(-1.0f, 2.5f, 5.0f),       // Ball 3 (red)
-	glm::vec3(3.0f, 2.5f, 5.0f),        // Ball 4 (purple)
-	glm::vec3(-3.0f, 2.5f, 7.0f),       // Ball 5 (orange)
-	glm::vec3(1.0f, 2.5f, 7.0f),        // Ball 6 (green)
+vector<glm::vec3> orientations = {
+	// First row
+	glm::vec3(0.0f, 0.0f, 0.0f),        //Ball1
+	glm::vec3(-2.0f, 2.5f, 3.0f),       //Ball2
+	glm::vec3(2.0f, 2.5f, 3.0f),        //Ball3
 
-	// Third row
-	glm::vec3(-2.0f, 2.5f, 9.0f),       // Ball 7 (maroon)
-	glm::vec3(0.0f, 2.5f, 9.0f),        // Ball 8 (black)
-	glm::vec3(4.0f, 2.5f, 9.0f),        // Ball 9 (yellow-striped)
+	// Second row						
+	glm::vec3(-1.0f, 2.5f, 5.0f),       //Ball4
+	glm::vec3(3.0f, 2.5f, 5.0f),        //Ball5
+	glm::vec3(-3.0f, 2.5f, 7.0f),       //Ball6
+	glm::vec3(1.0f, 2.5f, 7.0f),        //Ball7
 
-	// Fourth row
-	glm::vec3(-1.5f, 2.5f, 11.0f),      // Ball 10 (blue-striped)
-	glm::vec3(2.5f, 2.5f, 11.0f),       // Ball 11 (red-striped)
-	glm::vec3(-2.5f, 2.5f, 13.0f),      // Ball 12 (purple-striped)
+	// Third row						
+	glm::vec3(-2.0f, 2.5f, 9.0f),       //Ball8
+	glm::vec3(0.0f, 2.5f, 9.0f),        //Ball9
+	glm::vec3(4.0f, 2.5f, 9.0f),        //Ball10
 
-	// Fifth row
-	glm::vec3(-0.5f, 2.5f, 15.0f),      // Ball 13 (orange-striped)
-	glm::vec3(3.5f, 2.5f, 15.0f),       // Ball 14 (green-striped)
-	//glm::vec3(1.5f, 1.0f, 17.0f)        // Ball 15 (brown)
+	// Fourth row						
+	glm::vec3(-1.5f, 2.5f, 11.0f),      //Ball11
+	glm::vec3(2.5f, 2.5f, 11.0f),       //Ball12
+	glm::vec3(-2.5f, 2.5f, 13.0f),      //Ball13
+
+	// Fifth row						
+	glm::vec3(-0.5f, 2.5f, 15.0f),      //Ball14
+	glm::vec3(3.5f, 2.5f, 15.0f),       //Ball15
+	//glm::vec3(1.5f, 1.0f, 17.0f)      //Ball
 };
 
 GLuint tableShader;
 
 
-#define HEIGHT 1600
+#define HEIGHT 1600 
 #define WIDTH 900
 
 //View Movemnt
@@ -146,6 +168,7 @@ int main() {
 	glfwSetCursorPosCallback(window, onMouseMove);
 	glfwSetMouseButtonCallback(window, onMouseButton);
 	glfwSetScrollCallback(window, onScroll);
+	glfwSetKeyCallback(window, onSpaceClick);
 
 
 	vector<string> objFiles{
@@ -244,7 +267,24 @@ int main() {
 		int i = 0;
 		for (auto& obj : objArray)
 		{
+			if (i == 0 && ballIsMoving) {
+
+				std::cout << "Ball Is Moving" << endl;
+
+				//Translação
+				positions[i].x += 0;
+				positions[i].z += moveSpeed;
+
+				//Rotação
+				orientations[i].x += rotationSpeed;
+
+				//Check for collision.  -> A class ball está preparada para resolver isto, mas a interligação está a dar problemas
+				ballIsMoving = checkCollisions();
+
+			}
 			obj.Draw(positions[i++], glm::vec3(0.0f, 0.0f, 0.0f), modelMatrix * zoomMatrix);
+
+			
 		}
 		//obj1.Draw(glm::vec3(3.0f, 0.0f, .0f), glm::vec3(0.0f, 0.0f, 0.0f));
 		DrawTable(tableModel, mvp );
@@ -258,6 +298,40 @@ int main() {
 	return 0;
 }
 
+bool checkCollisions() {
+
+	// Checkamos para as outras bolas
+
+	for (int i = 1; i < objArray.size(); i++)
+	{
+		float distance = glm::distance(positions[0], positions[i]);
+
+		if (distance < ballRadius * 2) //Supõe-se que as bolas tenham o mesmo raio
+		{
+
+			std::cout << "Ball Hit Ball" << endl;
+			fullStop = true;
+			return false;
+		}
+	}
+
+	//Caso não colida com bolas, vamos checkar os limites da mesa
+
+	if (positions[0].x - ballRadius < -tableWidth / 2 ||
+		positions[0].x + ballRadius > tableWidth / 2 ||
+		positions[0].z - ballRadius < -tableLength / 2 ||
+		positions[0].z + ballRadius > tableLength /2) {
+
+		// Colidiu com a borda
+
+		std::cout << "Ball Hit Border" << endl;
+		fullStop = true;
+		return false;
+	}
+
+	// Sem Colisões
+	return true;
+}
 
 void init() {
 	glClearColor(0.02f, 0.0f, 0.2f, 0.0f);
@@ -326,6 +400,13 @@ void onMouseMove(GLFWwindow* window, double xpos, double ypos) {
 		// Update last mouse position
 		lastMouseX = xpos;
 		lastMouseY = ypos;
+	}
+}
+
+void onSpaceClick(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	if (fullStop) return;
+	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+		ballIsMoving = true;
 	}
 }
 
