@@ -100,7 +100,7 @@ void main()
 	light[3] = /**/vec4(0.0)/**/;
 
 	// C�lculo da cor final do fragmento.
-	fColor = (emissive + light[1] + vec4(0.2)) * texture(texSampler, uv);
+	fColor = (emissive + light[0] + light[1] + light[2] + light[3] + vec4(0.2)) * texture(texSampler, uv);
 }
 
 vec4 calcAmbientLight(AmbientLight light) {

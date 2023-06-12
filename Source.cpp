@@ -159,7 +159,7 @@ int main() {
 	else cout << "Glew Initialized Successfully " << "\n GL Version: " << glGetString(GL_VERSION) << endl;
 
 	init();
-	glfwSetKeyCallback(window, lighting::OnKeyPressed);
+	//glfwSetKeyCallback(window, lighting::OnKeyPressed);
 
 	//Glew Init must be called only when context has been defined 
 
@@ -226,11 +226,8 @@ int main() {
 
 	objArray.push_back(obj);*/
 
-
 	//Table
 	SetupTableRendering();
-
-
 
 	/*Load::Obj obj1;
 	objArray.push_back(obj1);
@@ -282,7 +279,7 @@ int main() {
 				ballIsMoving = checkCollisions();
 
 			}
-			obj.Draw(positions[i++], glm::vec3(0.0f, 0.0f, 0.0f), modelMatrix * zoomMatrix);
+			obj.Draw(positions[i++], glm::vec3(0.0f), modelMatrix * zoomMatrix);
 
 			
 		}
@@ -371,7 +368,6 @@ void init() {
 	{ GL_NONE, NULL }   //GL_None marca o final da lista de shader info
 	};
 
-
 	//Shader ID
 	tableShader = LoadShaders(tableShaders);
 
@@ -385,6 +381,7 @@ void onScroll(GLFWwindow* window, double xoffset, double yoffset) {
 	// Clamp zoom level to a sensible range if desired
 	// zoomLevel = glm::clamp(zoomLevel, 0.1f, 10.0f);
 }
+
 // Callback function for mouse movement event
 void onMouseMove(GLFWwindow* window, double xpos, double ypos) {
 	if (isMouseDragging) {
@@ -406,7 +403,29 @@ void onMouseMove(GLFWwindow* window, double xpos, double ypos) {
 void onSpaceClick(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (fullStop) return;
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
-		ballIsMoving = true;
+		ballIsMoving = !ballIsMoving;
+	}
+	//ambiente 1
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	{
+		cout << "test" << endl;
+		if (lighting::light[0]) lighting::light[0] = false;
+		else lighting::light[0] = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	{
+		if (lighting::light[1]) lighting::light[1] = false;
+		else lighting::light[1] = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+	{
+		if (lighting::light[2]) lighting::light[2] = false;
+		else lighting::light[2] = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+	{
+		if (lighting::light[3]) lighting::light[3] = false;
+		else lighting::light[3] = true;
 	}
 }
 

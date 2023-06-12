@@ -96,6 +96,7 @@ namespace lighting
 		//ambiente 1
 		if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 		{
+			cout << "test" << endl;
 			if (light[0]) light[0] = false;
 			else light[0] = true;
 		}
